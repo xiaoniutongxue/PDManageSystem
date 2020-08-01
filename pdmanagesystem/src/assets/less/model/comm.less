@@ -1,0 +1,94 @@
+@import "../variable";
+
+/*表格样式*/
+table{
+  width: 100%;
+  font-size: 12px;
+  margin-top: 5px;
+  border-collapse: collapse;
+  thead{
+    tr{
+      td{
+        height: 30px;
+        text-align: center;
+        font-weight: bold;
+        background: @tbl-bg;
+        border: 1px solid @tbl-bor;
+      }
+    }
+  }
+  tbody{
+    tr{
+      td{
+        height: 25px;
+        text-align: center;
+        border: 1px solid @tbl-bor;
+      }
+      .oper{
+        width: 10%;
+        span{
+          cursor: pointer;
+          margin-left: 10px;
+        }
+        span:hover{
+          color: @theme;
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+/*dilog对话框*/
+.dialog{
+  ul{
+    width: 90%;
+    height: auto;
+    margin: 0 auto;
+    list-style: none;
+    li{
+      width: 100%;
+      height: 30px;
+      margin-top: 10px;
+      display: flex;
+      /*border: 1px solid black;*/
+      span{
+        width: 20%;
+        text-align: right;
+        line-height: 30px;
+        margin-right: 10px;
+        display: block;
+        /*border: 1px solid black;*/
+      }
+      /*输入框长度较短的*/
+      .short_input{
+        width: 50%;
+      }
+      .input{
+        width: 70%;
+      }
+      .radio{
+        line-height: 30px;
+        margin-left: 10px;
+        /*border: 1px solid black;*/
+      }
+    }
+    .textli{
+      width: 100%;
+      height: 30px;
+      /*border: 1px solid red;*/
+      .input{
+        width: 80%;
+      }
+    }
+  }
+}
+
+/*数据为空时显示*/
+.null{
+  width: 100%;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 12px;
+  display: block;
+}

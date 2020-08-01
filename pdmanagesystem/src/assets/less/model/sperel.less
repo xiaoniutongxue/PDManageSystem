@@ -1,0 +1,217 @@
+@import "../variable";
+@import "comm";
+.rel_all{
+  width: 100%;
+  height: 100%;
+  /*本体关系头部*/
+  .rel_top{
+    width: 100%;
+    height: 50px;
+    display: flex;
+    background: #e5e5e5;
+    .top_left{
+      width: 40%;
+      border: 1px solid black;
+    }
+    .top_right{
+      .select{
+        margin-top: 10px;
+      }
+    }
+  }
+  /*本体关系内容*/
+  .rel_cont{
+    width: 100%;
+    height: 93.5%;
+    margin-top: 0.5%;
+    display: flex;
+    justify-content: space-evenly;
+    overflow-y: auto;
+    /*公共样式*/
+    .sperelcomm(){
+      width: 20%;
+      height: 99.5%;
+      border: 1px solid @tbl-bor;
+      /*选择框头部*/
+      .select-top{
+        width: 100%;
+        height: 5%;
+        border-bottom: 1px solid @tbl-bor;
+        h3{
+          width: 100%;
+          height: 5%;
+          line-height: 40px;
+          text-align: center;
+          /*border: 1px solid black;*/
+        }
+      }
+      /*选择框内容*/
+      .select_content{
+        width: 100%;
+        height: auto;
+        max-height: 94%;
+        overflow: auto;
+        /*border: 1px solid black;*/
+        /*单个选项*/
+        .spe-item{
+          width: 95%;
+          height: auto;
+          padding-left: 5%;
+          margin-top: 10px;
+          /*border-bottom: 1px solid #e8e8e8;*/
+          /*选型标题*/
+          .spe-tit{
+            width: 100%;
+            height: auto;
+            display: flex;
+            /*border: 1px solid black;*/
+            span{
+              font-size: 14px;
+              display: block;
+              padding: 5px 0px;
+              /*border: 1px solid black;*/
+            }
+            .propval{
+              width: 70%;
+              font-weight: bold;
+              /*border: 1px solid black;*/
+            }
+            .propradio{
+              width: 30%;
+              /*border: 1px solid black;*/
+              input{
+                margin-left: 5px;
+              }
+            }
+          }
+          /*选型选项*/
+          .spe-opt{
+            width: 100%;
+            height: auto;
+            display: flex;
+            /*border: 1px solid black;*/
+            ul{
+              width: 80%;
+              height: auto;
+              list-style: none;
+              display: flex;
+              flex-wrap: wrap;
+              /*border: 1px solid black;*/
+              li{
+                padding: 2px 10px;
+                font-size: 12px;
+                cursor: pointer;
+                margin-top: 5px;
+                display: flex;
+                /*border: 1px solid #e8e8e8;*/
+              }
+            }
+          }
+        }
+        /*添加关系*/
+        .spe-commit{
+          width: 99%;
+          height: 30px;
+          margin-top: 20px;
+          line-height: 30px;
+          font-size: 12px;
+          text-align: center;
+          /*border: 1px solid black;*/
+          h3{
+            width: 30%;
+            height: 100%;
+            cursor: pointer;
+            margin-left: 70%;
+            -webkit-user-select: none;
+            /*border: 1px solid black;*/
+          }
+          h3:hover{
+            color: #409eff;
+          }
+        }
+      }
+    }
+    /*选择添加项*/
+    .rel_select{
+      .sperelcomm();
+    }
+    /*选择添加项*/
+    .rel_add{
+      .sperelcomm();
+      .selectopt{
+        color: @theme;
+      }
+    }
+    /*选择添加项*/
+    .rel_showrel{
+      width: 58%;
+      height: 99.5%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      border: 1px solid @tbl-bor;
+      .showrel-top{
+        width: 100%;
+        height: 5%;
+        line-height: 40px;
+        text-align: center;
+        display: flex;
+        border: 1px solid @tbl-bor;
+        h3{
+          width: 80%;
+          height: 100%;
+          text-align: center;
+          border-right: 1px solid @tbl-bor;
+        }
+        .change{
+          width: 20%;
+          span{
+            font-size: 12px;
+            cursor: pointer;
+            margin-left: 20px;
+          }
+          span:hover{
+            color: @theme;
+          }
+        }
+      }
+      table{
+        width: 100%;
+        height: auto;
+        border-collapse: collapse;
+        thead{
+          tr{
+            td{
+              font-weight: bold;
+              font-size: 12px;
+              text-align: center;
+              height: 30px;
+              background: @tbl-bg;
+              border: 1px solid @tbl-bor;
+            }
+          }
+        }
+        tbody{
+          tr{
+            td{
+              height: 30px;
+              font-size: 12px;
+              text-align: center;
+              border: 1px solid @tbl-bor;
+            }
+            //.tit{
+            //  color: @theme;
+            //  font-weight: bold;
+            //}
+            .reldel{
+              cursor: pointer;
+            }
+            .reldel:hover{
+              color: @theme;
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+  }
+}
