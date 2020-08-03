@@ -93,7 +93,6 @@
           get_facdata(){
             get_factorydata().then(res=>{
               this.fac_data=res;
-              console.log(this.facseroridata.fac_id)
               if(this.facseroridata.fac_id===''){
                 this.fac_value=res[0].factName;
                 this.get_serdata(res[0].factID,res[0].factName);
@@ -112,7 +111,7 @@
               this.ser_data=res;
               if(res.length>0){
                 if(this.facseroridata.ser_id===''){
-                  this.ser_value=res[0].child[0].child[0].SeriesName;
+                  this.get_facserid(res[0].child[0].child[0])
                 }else{
                   this.ser_value=this.facseroridata.ser_name;
                 }

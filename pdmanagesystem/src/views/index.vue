@@ -77,6 +77,9 @@
 
       <!--右边内容-->
       <div class="cont_right">
+        <!--<div class="right-top">
+          <SearchFacSer/>
+        </div>-->
         <router-view></router-view>
       </div>
     </div>
@@ -84,6 +87,9 @@
 </template>
 
 <script>
+    // 1.导入组件
+    import SearchFacSer from "../components/comm/SearchFacSer";
+    // 2.导入方法
     import {get_areadata} from "../network/model/facmanage";
 
     export default {
@@ -96,14 +102,15 @@
         created() {
           this.get_Allarea();
         },
+        components:{
+          SearchFacSer
+        },
         methods:{
           // 1.获取全国地区
           get_Allarea(){
             get_areadata().then(res=>{
               if(res){
                 this.$store.commit('get_Areadate',res)
-                /*this.AllareaData=res;
-                this.get_provincedata(res);*/
               }else{
                 console.log('地区信息无法连接服务器')
               }
@@ -172,6 +179,11 @@
         height: 99%;
         margin: 3px auto;
         border: 1px solid @tbl-bor;
+        /*.right-top{
+          width: 100%;
+          height: 50px;
+          border: 1px solid black;
+        }*/
       }
     }
   }

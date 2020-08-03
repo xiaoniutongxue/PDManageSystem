@@ -89,12 +89,12 @@
               <table>
                 <thead>
                   <tr>
-                    <td>系列id</td>
-                    <td>系列名称</td>
-                    <td>系列简称</td>
-                    <td>添加时间</td>
-                    <td>添加用户</td>
-                    <td>操作</td>
+                    <td style="width: 10%">系列id</td>
+                    <td style="width: 35%">系列名称</td>
+                    <td style="width: 15%">系列简称</td>
+                    <td style="width: 20%">添加时间</td>
+                    <td style="width: 10%">添加用户</td>
+                    <td style="width: 10%">操作</td>
                   </tr>
                 </thead>
                 <tbody>
@@ -123,14 +123,16 @@
       <!--新增类型-->
       <el-dialog
         title="新增类型"
-        class="type-dilog"
+        class="dialog"
         :visible.sync="addtype_dilog"
         width="30%">
         <div class="form">
-          <div class="form-item">
-            <span>类型名称:</span>
-            <el-input class="input" v-model="type_val" size="small" placeholder="请输入类型名称"/>
-          </div>
+          <ul>
+            <li class="textli">
+              <span>类型名称:</span>
+              <el-input class="input" v-model="type_val" size="small" placeholder="请输入类型名称"/>
+            </li>
+          </ul>
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button @click="addtype_dilog = false">取 消</el-button>
@@ -141,18 +143,20 @@
       <!--新增系列-->
       <el-dialog
         title="新增系列"
-        class="type-dilog"
+        class="dialog"
         :visible.sync="addser_dilog"
         width="30%">
         <div class="form">
-          <div class="form-item">
-            <span>系列名称:</span>
-            <el-input class="input" v-model="ser_val" size="small" placeholder="请输入系列名称"/>
-          </div>
-          <div class="form-item" v-if="ser_shortinput">
-            <span>系列简称:</span>
-            <el-input class="input" v-model="ser_shortval" size="small" placeholder="请输入系列简称"/>
-          </div>
+          <ul>
+            <li class="textli">
+              <span>系列名称:</span>
+              <el-input class="input" v-model="ser_val" size="small" placeholder="请输入系列名称"/>
+            </li>
+            <li class="textli" v-if="ser_shortinput">
+              <span>系列简称:</span>
+              <el-input class="input" v-model="ser_shortval" size="small" placeholder="请输入系列简称"/>
+            </li>
+          </ul>
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button @click="addser_dilog = false">取 消</el-button>
@@ -163,14 +167,16 @@
       <!--修改类型-->
       <el-dialog
         title="修改类型"
-        class="type-dilog"
+        class="dialog"
         :visible.sync="updatetype_dilog"
         width="30%">
         <div class="form">
-          <div class="form-item">
-            <span>类型名称:</span>
-            <el-input class="input" v-model="type_val" size="small" placeholder="请输入类型名称"/>
-          </div>
+          <ul>
+            <li class="textli">
+              <span>类型名称:</span>
+              <el-input class="input" v-model="type_val" size="small" placeholder="请输入类型名称"/>
+            </li>
+          </ul>
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button @click="updatetype_dilog = false">取 消</el-button>
@@ -181,18 +187,20 @@
       <!--修改系列-->
       <el-dialog
         title="修改系列"
-        class="type-dilog"
+        class="dialog"
         :visible.sync="updateser_dilog"
         width="30%">
         <div class="form">
-          <div class="form-item">
-            <span>系列名称:</span>
-            <el-input class="input" v-model="ser_val" size="small" placeholder="请输入系列名称"/>
-          </div>
-          <div class="form-item" v-if="ser_shortinput">
-            <span>系列简称:</span>
-            <el-input class="input" v-model="ser_shortval" size="small" placeholder="请输入系列简称"/>
-          </div>
+          <ul>
+            <li class="textli">
+              <span>系列名称:</span>
+              <el-input class="input" v-model="ser_val" size="small" placeholder="请输入系列名称"/>
+            </li>
+            <li class="textli" v-if="ser_shortinput">
+              <span>系列简称:</span>
+              <el-input class="input" v-model="ser_shortval" size="small" placeholder="请输入系列简称"/>
+            </li>
+          </ul>
         </div>
         <span slot="footer" class="dialog-footer">
           <el-button @click="updateser_dilog = false">取 消</el-button>
@@ -509,6 +517,7 @@
 
 <style lang="less" scoped>
   @import "../../assets/less/variable";
+  @import "../../assets/less/model/comm";
   .ser_all{
     width: 100%;
     height: 100%;
@@ -599,13 +608,6 @@
           line-height: 40px;
           border-bottom: 1px solid @tbl-bor;
         }
-        .null{
-          width: 100%;
-          text-align: center;
-          margin-top: 20px;
-          font-size: 12px;
-          display: block;
-        }
         ul{
           width: 90%;
           margin-left: 10%;
@@ -689,79 +691,10 @@
                 .sysoper(30px);
               }
             }
-            table{
-              width: 100%;
-              margin-top: 10px;
-              border-collapse: collapse;
-              thead{
-                tr{
-                  td{
-                    height: 30px;
-                    font-size: 12px;
-                    font-weight: bold;
-                    text-align: center;
-                    background: @tbl-bg;
-                    border: 1px solid @tbl-bor;
-                  }
-                }
-              }
-              tbody{
-                tr{
-                  td{
-                    height: 30px;
-                    font-size: 12px;
-                    text-align: center;
-                    border: 1px solid @tbl-bor;
-                  }
-                }
-                .oper{
-                  width: 100px;
-                  cursor: pointer;
-                  span{
-                    margin-left: 10px;
-                  }
-                  span:hover{
-                    color: @theme;
-                    text-decoration: underline;
-                  }
-                }
-              }
-            }
           }
         }
-        .null{
-          width: 100%;
-          text-align: center;
-          margin-top: 20px;
-          font-size: 12px;
-          display: block;
-        }
-
       }
     }
-    /*dilog*/
-    .type-dilog{
-      .form{
-        width: 100%;
-        height: auto;
-        /*border: 1px solid black;*/
-        .form-item{
-          width: 100%;
-          height: 30px;
-          margin-top: 10px;
-          span{
-            font-weight: bold;
-            line-height: 30px;
-          }
-          .input{
-            width: 200px;
-            outline: none;
-            height: 25px;
-            margin-left: 20px;
-          }
-        }
-      }
-    }     /*新增类型*/
     .selcol{
       color: @theme;
     }

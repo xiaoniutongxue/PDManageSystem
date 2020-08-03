@@ -183,7 +183,6 @@
         watch:{
           /*监听系列id发生改变*/
           seriesid(newVal){
-            console.log(1)
             this.get_acctypedata(newVal);
           },
           typeid(newVal){
@@ -450,7 +449,6 @@
           /*获取可视化关系*/
           get_accreldata(seriesid){
             get_accrelview(seriesid,this.acc_typeid).then(res=>{
-              console.log(res)
               this.acc_reldata=res
             })
           },

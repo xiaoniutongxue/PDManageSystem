@@ -6,10 +6,13 @@
       <!--<div>
         {{img_data}}
       </div>-->
+      <login/>
     </div>
 </template>
 
 <script>
+    import login from "../../views/login";
+
     import {get_imgdata} from "../../network/model/test";
     import {get_file} from "../../network/model/test";
 
@@ -23,6 +26,9 @@
         },
       created() {
           /*this.get_imgdata(1);*/
+      },
+      components:{
+        login
       },
       methods:{
           get_imgdata(e){

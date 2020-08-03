@@ -23,6 +23,8 @@
             <span @click="show_dilogaddo(prop)">新增选项</span>
             <span @click="show_dilogupdatep(prop)">修改</span>
             <span @click="del_prop(prop.propId)">删除</span>
+            <span><i class="el-icon-top" title="上移" @click="move_prop(prop,'up')"/></span>
+            <span><i class="el-icon-bottom" title="下移" @click="move_prop(prop,'down')"/></span>
           </div>
         </div>
         <table>
@@ -41,7 +43,7 @@
             <tr v-show="prop.child==''">
               <td colspan="7">该标题暂未添加选项</td>
             </tr>
-            <tr v-for="opt in prop.child">
+            <tr v-for="(opt,j) in prop.child">
               <td>{{opt.optId}}</td>
               <td>{{opt.optName}}</td>
               <td>{{opt.optValue}}</td>
@@ -51,6 +53,8 @@
               <td class="oper">
                 <span @click="show_dilogupdateo(prop,opt)">修改</span>
                 <span @click="del_opt(opt.optId)">删除</span>
+                <span><i class="el-icon-top" title="上移" @click="move_opt(opt,'up')"/></span>
+                <span><i class="el-icon-bottom" title="下移" @click="move_opt(opt,'down')"/></span>
               </td>
             </tr>
           </tbody>
@@ -146,13 +150,15 @@
     import SearchFacSer from "../comm/SearchFacSer";
 
     /*导入方法*/
-    import {get_spedata} from "../../network/model/spemanage";      /*获取本体选项数据*/
-    import {add_speprop} from "../../network/model/spemanage";      /*添加标题*/
-    import {add_speopt} from "../../network/model/spemanage";       /*添加选项*/
-    import {update_speprop} from "../../network/model/spemanage";   /*修改标题*/
-    import {update_speopt} from "../../network/model/spemanage";    /*修改选项*/
-    import {del_speprop} from "../../network/model/spemanage";      /*删除标题*/
-    import {del_speopt} from "../../network/model/spemanage";       /*删除选项*/
+    import {get_spedata} from "../../network/model/spemanage";          /*获取本体选项数据*/
+    import {add_speprop} from "../../network/model/spemanage";          /*添加标题*/
+    import {add_speopt} from "../../network/model/spemanage";           /*添加选项*/
+    import {update_speprop} from "../../network/model/spemanage";       /*修改标题*/
+    import {update_speopt} from "../../network/model/spemanage";        /*修改选项*/
+    import {del_speprop} from "../../network/model/spemanage";          /*删除标题*/
+    import {del_speopt} from "../../network/model/spemanage";           /*删除选项*/
+    import {change_speoptorder} from "../../network/model/spemanage";   /*更改本体排序*/
+    import {change_speproporder} from "../../network/model/spemanage";
 
     export default {
         name: "SpeDataManage",
@@ -180,10 +186,6 @@
         components:{
           SearchFacSer
         },
-        created(){
-          /*console.log(1)
-          console.log(this.seriesid)*/
-        },
         computed:{
           /*用户*/
           user(){
@@ -209,7 +211,6 @@
         },
         methods:{
           // 1.获取数据
-
           /*b.获取本体规格数据*/
           get_spedata(seriesid){
             get_spedata(seriesid).then(res=>{
@@ -256,7 +257,7 @@
           },
 
           // 3.数据添加
-          /*添加标题*/
+          /*a.添加标题*/
           add_prop(){
             if(this.propname.trim()==""){
               this.$message({
@@ -298,7 +299,7 @@
             })
           },
 
-          /*添加选项*/
+          /*b.添加选项*/
           add_opt(){
             /*判断选项值是否为空*/
             if(this.optname.trim()==""){
@@ -341,7 +342,7 @@
           },
 
           // 4.数据修改
-          /*修改标题*/
+          /*a.修改标题*/
           update_prop(){
             if(this.propname==""){
               this.$message({
@@ -376,7 +377,7 @@
             })
           },
 
-          /*修改选项*/
+          /*b.修改选项*/
           update_opt(){
             if(this.optname==""){
               this.$message({
@@ -413,7 +414,7 @@
           },
 
           // 5.数据删除
-          /*删除标题*/
+          /*a.删除标题*/
           del_prop(propid){
             this.$confirm("确认删除该项及其所有子项吗？",'提示',{
               confirmButtonText:'确认',
@@ -439,7 +440,7 @@
             })
           },
 
-          /*删除选项*/
+          /*b.删除选项*/
           del_opt(optId){
             this.$confirm("确认删除该项吗？",'提示',{
               confirmButtonText:'确认',
@@ -462,6 +463,62 @@
                 message: '已取消删除',
                 duration:1000
               });
+            })
+          },
+
+          // 6.数据排序
+          /*a.标题排序*/
+          move_prop(data,oper){
+            let spedata = {
+              oper:oper,
+              seriesId:data.seriesId,
+              propId:data.propId,
+              showOrder:data.showOrder
+            }
+            spedata=JSON.stringify(spedata)
+            change_speproporder(spedata).then(res=>{
+              if(res.code==200){
+                this.$message({
+                  type:"success",
+                  message:res.message,
+                  duration:1000
+                })
+                this.get_spedata(this.seriesid)
+              }else{
+                this.$message({
+                  type:"warning",
+                  message:res.message,
+                  duration:1000
+                })
+              }
+            })
+          },
+
+          /*b.选项排序*/
+          move_opt(data,oper){
+            let spedata = {
+              oper:oper,
+              seriesId:data.seriesId,
+              propId:data.propId,
+              optId:data.optId,
+              showOrder:data.showOrder
+            }
+            spedata=JSON.stringify(spedata)
+            change_speoptorder(spedata).then(res=>{
+              if(res.code==200){
+                this.$message({
+                  type:"success",
+                  message:res.message,
+                  duration:1000
+                })
+                this.get_spedata(this.seriesid)
+              }else{
+                this.$message({
+                  type:"warning",
+                  message:res.message,
+                  duration:1000
+                })
+              }
             })
           },
         },
@@ -533,7 +590,7 @@
           background: #dadada;
           /*border: 1px solid @tbl-bor;*/
           h3{
-            width: 90%;
+            width: 80%;
             height: 100%;
             line-height: 30px;
             font-size: 16px;
@@ -541,9 +598,10 @@
             /*border: 1px solid black;*/
           }
           .oper{
-            width: 10%;
+            width: 20%;
             height: 100%;
-            text-align: center;
+            text-align: right;
+            margin-right: 10px;
             /*border: 1px solid black;*/
             span{
               cursor: pointer;
@@ -554,43 +612,6 @@
             span:hover{
               color: @theme;
               text-decoration: underline;
-            }
-          }
-        }
-        table{
-          width: 100%;
-          font-size: 12px;
-          margin-top: 5px;
-          border-collapse: collapse;
-          thead{
-            tr{
-              td{
-                height: 30px;
-                text-align: center;
-                font-weight: bold;
-                background: @tbl-bg;
-                border: 1px solid @tbl-bor;
-              }
-            }
-          }
-          tbody{
-            tr{
-              td{
-                height: 25px;
-                text-align: center;
-                border: 1px solid @tbl-bor;
-              }
-              .oper{
-                width: 10%;
-                span{
-                  cursor: pointer;
-                  margin-left: 10px;
-                }
-                span:hover{
-                  color: @theme;
-                  text-decoration: underline;
-                }
-              }
             }
           }
         }

@@ -212,5 +212,28 @@ export function del_specompdata(compId) {
   })
 }
 
+/*本体规格标题排序*/
+export function change_speoptorder(spedata) {
+  return request({
+    method:'POST',
+    url:'/change_speoptorder',
+    params:{
+      spedata
+    },
+  })
+}
+
+/*本体规格选项排序*/
+export function change_speproporder(spedata) {
+  return request({
+    method:'POST',
+    url:'/change_speproporder',
+    params:{
+      spedata
+    },
+  })
+}
+
+
 
 

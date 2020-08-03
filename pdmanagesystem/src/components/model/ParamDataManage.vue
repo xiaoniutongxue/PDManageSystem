@@ -273,17 +273,21 @@
           }
         },
         watch:{
+          /*监听系列*/
           seriesid(newVal){
             this.get_paramdata(newVal);
             this.get_spedata(newVal)
           },
+          /*监听特性参数*/
           paramdata(newVal){
             if(newVal){
               if(this.typeid){
                 this.get_propdate(this.typeid)
               }else{
-                this.typeval=newVal[0].typeName
-                this.get_propdate(newVal[0].typeId)
+                if(newVal.length>0){
+                  this.typeval=newVal[0].typeName
+                  this.get_propdate(newVal[0].typeId)
+                }
               }
             }else{
               this.typeval="";
@@ -340,14 +344,13 @@
 
           /*d.获取特性参数内容数据*/
           get_propdate(typeid){
-            this.typeid=typeid
-            this.propdata=[]
+            this.typeid=typeid;
+            this.propdata=[];
             for(let i=0;i<this.paramdata.length;i++){
               if(this.paramdata[i].typeId==typeid){
                 this.propdata=this.paramdata[i].child
               }
             }
-            /*console.log(this.propdata)*/
           },
 
           // 2.显示对话框
