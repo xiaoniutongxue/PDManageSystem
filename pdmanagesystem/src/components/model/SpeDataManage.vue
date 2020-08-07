@@ -68,13 +68,13 @@
       <ul>
         <li class="textli">
           <span>标题名称:</span>
-          <el-input v-model="propname" size="small" placeholder="批量添加多个标题请以空格分开(如：标题1 标题2)"/>
+          <el-input v-model="propname" size="small" placeholder="请输入标题名称"/>
         </li>
       </ul>
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dilog_addp = false">取 消</el-button>
-        <el-button type="primary" @click="add_prop">确 定</el-button>
+        <el-button type="primary" @click="add_prop" @keyup.enter.native="get">确 定</el-button>
       </span>
     </el-dialog>
     <el-dialog class="dialog" title="添加选项" :visible.sync="dilog_addo" width="30%">
@@ -210,6 +210,9 @@
           },
         },
         methods:{
+          get(){
+            console.log(1)
+          },
           // 1.获取数据
           /*b.获取本体规格数据*/
           get_spedata(seriesid){
@@ -526,8 +529,8 @@
 </script>
 
 <style lang="less" scoped>
-  @import "../../assets/less/variable";
-  @import "../../assets/less/model/comm";
+  @import "../../assets/less/comm/variable";
+  @import "../../assets/less/comm/comm";
   .spedata_all{
     width: 100%;
     height: 100%;
@@ -570,13 +573,6 @@
       height: 93.5%;
       margin-top: 0.5%;
       overflow-y: auto;
-      .null{
-        display: block;
-        width: 100%;
-        text-align: center;
-        margin-top: 20px;
-        font-size: 12px;
-      }
       .data_item{
         width: 99%;
         height: auto;

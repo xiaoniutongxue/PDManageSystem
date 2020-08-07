@@ -1,12 +1,11 @@
 <template>
     <div class="accdata_all">
-      <div>
-        <input type="file" id="file" name="filename" @change="get_imgdata"/>
-      </div>
       <!--<div>
-        {{img_data}}
+        <input type="file" id="file" name="filename" @change="get_imgdata"/>
       </div>-->
-      <login/>
+      <div>
+        <login/>
+      </div>
     </div>
 </template>
 
@@ -24,9 +23,9 @@
             img_data:[]
           }
         },
-      created() {
-          /*this.get_imgdata(1);*/
-      },
+        created() {
+            /*this.get_imgdata(1);*/
+        },
       components:{
         login
       },
@@ -42,7 +41,7 @@
 </script>
 
 <style lang="less" scoped>
-  @import "../../assets/less/variable";
+  @import "../../assets/less/comm/variable";
   .accdata_all{
     width: 100%;
     height: 100%;

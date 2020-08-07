@@ -147,7 +147,7 @@
 </script>
 
 <style lang="less" scoped>
-  @import "../../assets/less/variable";
+  @import "../../assets/less/comm/variable";
   .area{
     width: 100%;
     height: auto;
@@ -156,8 +156,8 @@
       margin-right: 5px;
       height: 25px;
       outline: none;
-      color: black;
-      /*border: 1px solid @tbl-bor;*/
+      color: #c4c4cf;
+      border: 1px solid @tbl-bor;
     }
   }
 </style>

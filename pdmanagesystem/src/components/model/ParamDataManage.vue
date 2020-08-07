@@ -644,8 +644,8 @@
 </script>
 
 <style lang="less" scoped>
-  @import "../../assets/less/variable";
-  @import "../../assets/less/model/comm";
+  @import "../../assets/less/comm/variable";
+  @import "../../assets/less/comm/comm";
   .param-all{
     width: 100%;
     height: 100%;

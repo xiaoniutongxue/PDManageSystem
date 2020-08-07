@@ -20,14 +20,14 @@
             <h3>附件类别</h3>
             <span class="null" v-show="Acc_typeData==''">该厂商暂未添加系列</span>
             <ul class="first">
-              <li v-for="fir in Acc_typeData">
+              <li v-for="(fir,i) in Acc_typeData">
                 <h5 @click="get_AccPropData(fir,'',fir.typeId)">
                   <i class="el-icon-caret-right"></i>
                   {{fir.typeName}}
                 </h5>
                 <ul class="second">
                   <li
-                      v-for="sec in fir.child"
+                      v-for="(sec,j) in fir.child"
                       @click="get_AccPropData(fir,sec.typeId,fir.typeId)">
                       {{sec.typeName}}
                   </li>
@@ -427,6 +427,7 @@
             this.get_spedata(newVal);
             /*b.获取类型数据*/
             this.get_acctypedata(newVal);
+            this.Acc_PropData=[]
           },
 
           /*2.监听附件数据发生改变*/
@@ -911,8 +912,8 @@
 </script>
 
 <style lang="less" scoped>
-  @import "../../assets/less/variable";
-  @import "../../assets/less/model/comm";
+  @import "../../assets/less/comm/variable";
+  @import "../../assets/less/comm/comm";
   .accdata_all{
     width: 100%;
     height: 100%;

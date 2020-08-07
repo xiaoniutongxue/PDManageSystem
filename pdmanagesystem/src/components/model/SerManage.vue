@@ -66,7 +66,7 @@
             <!--右边头部-->
             <div class="right-top">
               <!--左边类型名称-->
-              <h3>{{ser_msgdata[0].SeriesName}}类型数据详情</h3>
+              <h3>{{ser_msgdata[0].SeriesName}}</h3>
               <div class="oper">
                 <span @click="show_adddilog('sersen',ser_msgdata[0].SeriesId)">新增子项</span>
                 <span @click="show_updatedilog('type',ser_msgdata[0].SeriesId,ser_msgdata[0])">修改</span>
@@ -516,8 +516,8 @@
 </script>
 
 <style lang="less" scoped>
-  @import "../../assets/less/variable";
-  @import "../../assets/less/model/comm";
+  @import "../../assets/less/comm/variable";
+  @import "../../assets/less/comm/comm";
   .ser_all{
     width: 100%;
     height: 100%;
@@ -580,7 +580,7 @@
           padding: 5px 8px;
           font-size: 14px;
           margin-top: 10px;
-          margin-left: 82%;
+          margin-left: 87%;
           background: @theme;
           color: white;
           border-radius: 5px;

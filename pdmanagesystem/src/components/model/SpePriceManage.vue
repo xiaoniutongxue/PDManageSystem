@@ -40,6 +40,10 @@
                 <span class="tit">型号价格:</span>
                 <el-input class="input" size="small" v-model="comp_price" placeholder="请输入价格"></el-input>
               </li>
+              <li class="price">
+                <span class="tit">订货号:</span>
+                <el-input class="input" size="small" v-model="comp_ordernum" placeholder="请输入订货号"></el-input>
+              </li>
               <li class="oper">
                 <span class="tit" @click="add_compdata">添加</span>
               </li>
@@ -125,6 +129,7 @@
             comp_id:'',          /*型号id*/
             comp_name:'',        /*型号名称*/
             comp_price:'',       /*型号价格*/
+            comp_ordernum:'',     /*订货号*/
             comp_propstr:'',     /*组成型号标题*/
             comp_optstr:'',      /*组成型号选项*/
 

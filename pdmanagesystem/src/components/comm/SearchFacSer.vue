@@ -139,7 +139,7 @@
 </script>
 
 <style lang="less" scoped>
-  @import "../../assets/less/variable";
+  @import "../../assets/less/comm/variable";
   .search_all{
     width: 100%;
     height: 100%;
