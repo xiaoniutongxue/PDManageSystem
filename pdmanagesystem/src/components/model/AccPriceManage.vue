@@ -42,11 +42,15 @@
         <!--头部型号名称-->
         <div class="right-top">
           <ul>
-            <li class="name">
+            <li>
               <span class="tit">型号名称:</span>
-              <span class="opt">{{comp_name}}</span>
+              <el-input class="input" size="small" v-model="comp_name" placeholder="请输入型号"></el-input>
             </li>
-            <li class="price">
+            <li>
+              <span class="tit">订货号:</span>
+              <el-input class="input" size="small" v-model="comp_ordernum" placeholder="请输入订货号"></el-input>
+            </li>
+            <li>
               <span class="tit">型号价格:</span>
               <el-input class="input" size="small" v-model="comp_price" placeholder="请输入价格"></el-input>
             </li>
@@ -61,13 +65,13 @@
           <table>
             <thead>
               <tr>
-                <td>id</td>
-                <td>名称</td>
-                <td>价格</td>
-                <td>订货号</td>
-                <td>添加用户</td>
-                <td>添加时间</td>
-                <td>操作</td>
+                <td style="width: 5%">id</td>
+                <td style="width: 25%">名称</td>
+                <td style="width: 20%">订货号</td>
+                <td style="width: 10%">价格</td>
+                <td style="width: 10%">添加用户</td>
+                <td style="width: 20%">添加时间</td>
+                <td style="width: 10%">操作</td>
               </tr>
             </thead>
             <tbody>
@@ -134,6 +138,7 @@
             compdata:[],         /*型号价格所有数据*/
             comp_id:'',          /*型号id*/
             comp_name:'',        /*型号名称*/
+            comp_ordernum:'',    /*型号订货号*/
             comp_price:'',       /*型号价格*/
             comp_propstr:'',     /*组成型号标题*/
             comp_optstr:'',      /*组成型号选项*/
@@ -169,6 +174,9 @@
           sername(){
             return this.$store.state.facserdata.ser_name
           },
+        },
+        created(){
+          this.get_acctypedata(this.seriesid);
         },
         watch:{
           /*a.监听系列id*/
@@ -306,6 +314,7 @@
               typeId:this.acc_typeid,
               seriesId:this.seriesid,
               compName:this.comp_name,
+              compNumber:this.comp_ordernum,
               compPrice:this.comp_price,
               propStr:this.comp_propstr,
               optStr:this.comp_optstr,

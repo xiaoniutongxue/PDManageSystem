@@ -12,6 +12,7 @@
             <span @click="show_addtdilog(-1)">新增类型</span>
           </div>
         </div>
+        <!--{{Acc_SelectedData}}-->
 
         <!--附件数据管理内容-->
         <div class="accdata_cont">
@@ -21,13 +22,16 @@
             <span class="null" v-show="Acc_typeData==''">该厂商暂未添加系列</span>
             <ul class="first">
               <li v-for="(fir,i) in Acc_typeData">
-                <h5 @click="get_AccPropData(fir,'',fir.typeId)">
+                <h5
+                  :class="{changeColor:Acc_SelectedData.typefirid==fir.typeId}"
+                  @click="get_AccPropData(fir,'',fir.typeId)">
                   <i class="el-icon-caret-right"></i>
                   {{fir.typeName}}
                 </h5>
                 <ul class="second">
                   <li
                       v-for="(sec,j) in fir.child"
+                      :class="{changeColor:Acc_SelectedData.typeid==sec.typeId}"
                       @click="get_AccPropData(fir,sec.typeId,fir.typeId)">
                       {{sec.typeName}}
                   </li>
@@ -420,6 +424,13 @@
         components:{
           SearchFacSer
         },
+        created(){
+          /*a.获取本体数据*/
+          this.get_spedata(this.seriesid);
+          /*b.获取类型数据*/
+          this.get_acctypedata(this.seriesid);
+          this.Acc_PropData=[]
+        },
         watch:{
           /*1.监听系列*/
           seriesid(newVal){
@@ -434,12 +445,12 @@
           Acc_typeData(newVal){
             if(this.Acc_SelectedData.typeid==0){
               if(newVal.length>0){
-                this.get_AccPropData(newVal[0],'')
+                this.get_AccPropData(newVal[0],'',newVal[0].typeId)
               }
             }else{
               for(let i=0;i<newVal.length;i++){
                 if(newVal[i].typeId==this.Acc_SelectedData.typefirid){
-                  this.get_AccPropData(newVal[i],this.Acc_SelectedData.typeid)
+                  this.get_AccPropData(newVal[i],this.Acc_SelectedData.typeid,this.Acc_SelectedData.typefirid)
                 }
               }
             }
@@ -588,7 +599,7 @@
           },
 
           // 3.添加数据
-          /*添加附件类型*/
+          /*a.添加附件类型*/
           add_typedata(){
             /*判断输入的值是否为空*/
             if(this.type_name==''){
@@ -628,7 +639,7 @@
             })
           },
 
-          /*添加附件标题*/
+          /*b.添加附件标题*/
           add_propdata(){
             if(this.prop_name.trim()==""){
               this.$message({
@@ -667,7 +678,7 @@
             })
           },
 
-          /*添加附件选项*/
+          /*c.添加附件选项*/
           add_optdata(){
             /*判断选项值是否为空*/
             if(this.opt_name.trim()==""){
@@ -713,7 +724,7 @@
           },
 
           // 4.修改数据
-          /*修改附件类型*/
+          /*a.修改附件类型*/
           update_typedata(){
             /*判断输入的值是否为空*/
             if(this.type_name==''){
@@ -754,7 +765,7 @@
             })
           },
 
-          /*修改附件标题*/
+          /*b.修改附件标题*/
           update_propdata(){
             if(this.prop_name.trim()==""){
               this.$message({
@@ -792,7 +803,7 @@
             })
           },
 
-          /*修改附件选项*/
+          /*c.修改附件选项*/
           update_optdata(){
             /*判断选项值是否为空*/
             if(this.opt_name.trim()==""){

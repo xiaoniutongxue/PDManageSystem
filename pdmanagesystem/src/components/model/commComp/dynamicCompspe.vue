@@ -14,7 +14,7 @@
                      />
                 <span>
                     {{tititem.propName}}
-                    {{tititem.compChar}}
+                    <!--{{tititem.compChar}}-->
                 </span>
             </div>
             <div class="dy-option">
@@ -24,7 +24,7 @@
                             v-if="is_ShowOpt(optitem.optId)" v-for="(optitem,j) in tititem.child"
                             @click="is_changeColor(i,optitem.optId)">
                             {{optitem.optName}}
-                            {{optitem.optId}}
+                            <!--{{optitem.optId}}-->
                         </li>
                     </div>
                     <div style="clear: both"></div>
@@ -62,6 +62,9 @@
 
                 /*全选*/
                 dy_CheckedAll:'',         /*全选框绑定值*/
+
+                /*循环监听*/
+                dy_num:0,
             }
         },
         watch:{
@@ -85,8 +88,15 @@
             seriesid(){
               this.clear_selected();
             },
+            /*f.全选*/
             dy_CheckedAll(newVal){
               this.selected_all(newVal)
+            },
+            // i.请求两次关系数据
+            dy_DefSelectedOptList(newVal){
+              this.$nextTick(function () {
+                this.get_ClickOptlist()
+              })
             },
         },
         updated() {

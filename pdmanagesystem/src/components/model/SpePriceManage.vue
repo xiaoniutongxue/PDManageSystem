@@ -32,17 +32,17 @@
           <!--头部型号名称-->
           <div class="right-top">
             <ul>
-              <li class="name">
+              <li>
                 <span class="tit">型号名称:</span>
-                <span class="opt">{{comp_name}}</span>
+                <el-input class="input" size="small" v-model="comp_name" placeholder="请输入型号"></el-input>
               </li>
-              <li class="price">
-                <span class="tit">型号价格:</span>
-                <el-input class="input" size="small" v-model="comp_price" placeholder="请输入价格"></el-input>
-              </li>
-              <li class="price">
+              <li>
                 <span class="tit">订货号:</span>
                 <el-input class="input" size="small" v-model="comp_ordernum" placeholder="请输入订货号"></el-input>
+              </li>
+              <li>
+                <span class="tit">型号价格:</span>
+                <el-input class="input" size="small" v-model="comp_price" placeholder="请输入价格"></el-input>
               </li>
               <li class="oper">
                 <span class="tit" @click="add_compdata">添加</span>
@@ -55,13 +55,13 @@
             <table>
               <thead>
                 <tr>
-                  <td>id</td>
-                  <td>名称</td>
-                  <td>价格</td>
-                  <td>订货号</td>
-                  <td>添加用户</td>
-                  <td>添加时间</td>
-                  <td>操作</td>
+                  <td style="width: 5%">id</td>
+                  <td style="width: 25%">名称</td>
+                  <td style="width: 20%">订货号</td>
+                  <td style="width: 10%">价格</td>
+                  <td style="width: 10%">添加用户</td>
+                  <td style="width: 20%">添加时间</td>
+                  <td style="width: 10%">操作</td>
                 </tr>
               </thead>
               <tbody>
@@ -84,7 +84,7 @@
       </div>
 
       <!--dilog对话框-->
-      <el-dialog class="dialog" title="修改价格" :visible.sync="dilog_update" width="30%">
+      <el-dialog class="dialog" title="修改价格" :visible.sync="dilog_update" width="40%">
         <ul>
           <li class="textli">
             <span>型号名称:</span>
@@ -159,12 +159,19 @@
             return this.$store.state.facserdata.ser_name
           },
         },
+        created(){
+          this.get_spedata(this.seriesid);
+          this.get_compdata(this.seriesid);
+          this.comp_price='';
+          this.comp_ordernum='';
+        },
         watch:{
           /*监听系列id*/
           seriesid(newVal){
             this.get_spedata(newVal);
             this.get_compdata(newVal);
-            this.comp_price=''
+            this.comp_price='';
+            this.comp_ordernum='';
           },
           /*监听勾选上的选项*/
           spe_msgdata(newVal){
@@ -172,6 +179,10 @@
           },
           spe_chlist(newVal){
             this.get_compTit(newVal)
+          },
+          comp_optstr(){
+            this.comp_price='';
+            this.comp_ordernum='';
           },
         },
         methods:{
@@ -225,7 +236,11 @@
                 optstr=optstr+'-'+this.spe_msgdata['optList'][this.spe_chlist[i]]
               }
             }
-            this.comp_name=this.sername+'-'+compTit;
+            if(this.sername==''){
+              this.comp_name=compTit
+            }else{
+              this.comp_name=this.sername+'-'+compTit;
+            }
             this.comp_propstr=this.spe_msgdata.propStr
             this.comp_optstr=this.spe_msgdata.optStr
             if(compTit==''){
@@ -259,9 +274,9 @@
               seriesId:this.seriesid,
               compName:this.comp_name,
               compPrice:this.comp_price,
+              compNumber:this.comp_ordernum,
               propStr:this.comp_propstr,
               optStr:this.comp_optstr,
-              serName:this.sername,
               AddUser:this.user,
               AddTime:this.sys_date,
             }

@@ -10,6 +10,7 @@
       <!--新增标题-->
       <div class="top_add">
         <span @click="show_dilogaddp">新增标题</span>
+        <span @click="get_webdata">数据读取</span>
       </div>
     </div>
 
@@ -64,7 +65,7 @@
 
     <!--dilog对话框-->
     <!--添加-->
-    <el-dialog class="dialog" title="添加标题" :visible.sync="dilog_addp" width="30%">
+    <el-dialog class="dialog" title="添加标题" :visible.sync="dilog_addp" width="40%">
       <ul>
         <li class="textli">
           <span>标题名称:</span>
@@ -74,10 +75,10 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="dilog_addp = false">取 消</el-button>
-        <el-button type="primary" @click="add_prop" @keyup.enter.native="get">确 定</el-button>
+        <el-button type="primary" @click="add_prop">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog class="dialog" title="添加选项" :visible.sync="dilog_addo" width="30%">
+    <el-dialog class="dialog" title="添加选项" :visible.sync="dilog_addo" width="40%">
       <ul>
         <li>
           <span>所属标题:</span>
@@ -99,7 +100,7 @@
       </span>
     </el-dialog>
     <!--修改-->
-    <el-dialog class="dialog" title="修改标题" :visible.sync="dilog_updatep" width="30%">
+    <el-dialog class="dialog" title="修改标题" :visible.sync="dilog_updatep" width="40%">
       <ul>
         <li>
           <span>标题名称:</span>
@@ -121,7 +122,7 @@
         <el-button type="primary" @click="update_prop">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog class="dialog" title="修改选项" :visible.sync="dilog_updateo" width="30%">
+    <el-dialog class="dialog" title="修改选项" :visible.sync="dilog_updateo" width="40%">
       <ul>
         <li>
           <span>所属标题:</span>
@@ -142,12 +143,20 @@
         <el-button type="primary" @click="update_opt">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!--抽屉-->
+    <el-drawer class="drawer" size=500px title="网页数据" :with-header="false" :visible.sync="drawer_show" :direction="drawer_direction">
+      <div class="dreawer_div">
+        <drawerComp :drawerdata="drawer_data" @show_drawer="show_drawer"/>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
 <script>
     /*导入组件*/
     import SearchFacSer from "../comm/SearchFacSer";
+    import drawerComp from "./commComp/drawerComp";
 
     /*导入方法*/
     import {get_spedata} from "../../network/model/spemanage";          /*获取本体选项数据*/
@@ -157,34 +166,43 @@
     import {update_speopt} from "../../network/model/spemanage";        /*修改选项*/
     import {del_speprop} from "../../network/model/spemanage";          /*删除标题*/
     import {del_speopt} from "../../network/model/spemanage";           /*删除选项*/
-    import {change_speoptorder} from "../../network/model/spemanage";   /*更改本体排序*/
-    import {change_speproporder} from "../../network/model/spemanage";
+    import {change_speoptorder} from "../../network/model/spemanage";   /*更改本体标题排序*/
+    import {change_speproporder} from "../../network/model/spemanage";  /*更改本体选项排序*/
+    import {get_modelfile} from "../../network/model/util";             /*读取文件*/
 
     export default {
         name: "SpeDataManage",
         data(){
           return{
-            // 2.本体数据
+            // 1.本体数据
             spe_data:[],         /*本体规格数据*/
 
-            // 3.dilog
+            // 2.dilog
             dilog_addp:false,       /*标题dilog*/
             dilog_addo:false,       /*选项dilog*/
             dilog_updatep:false,    /*标题dilog*/
             dilog_updateo:false,    /*选项dilog*/
 
-            // 4.输入框绑定值
-            propid:'',          /*标题id*/
-            propname:'',        /*标题绑定值*/
-            propcode:'',        /*连接符*/
-            optid:'',           /*选项绑定id*/
-            optname:'',         /*选项绑定值名称*/
-            optvalue:'',        /*选项绑定值*/
+            // 3.输入框绑定值
+            propid:'',             /*标题id*/
+            propname:'',           /*标题绑定值*/
+            propcode:'',           /*连接符*/
+            optid:'',              /*选项绑定id*/
+            optname:'',            /*选项绑定值名称*/
+            optvalue:'',           /*选项绑定值*/
 
+            // 4.界面抽屉数据
+            drawer_data:[],           /*抽屉数据*/
+            drawer_show:false,         /*控制是否显示抽屉*/
+            drawer_direction:'rtl',    /*抽屉打开方向*/
           }
         },
+        created(){
+          this.get_spedata(this.seriesid);
+        },
         components:{
-          SearchFacSer
+          SearchFacSer,
+          drawerComp
         },
         computed:{
           /*用户*/
@@ -210,9 +228,6 @@
           },
         },
         methods:{
-          get(){
-            console.log(1)
-          },
           // 1.获取数据
           /*b.获取本体规格数据*/
           get_spedata(seriesid){
@@ -524,6 +539,24 @@
               }
             })
           },
+
+          // 7.网页数据读取
+          /*a.获取抽屉数据*/
+          get_webdata(){
+            this.drawer_show=true;
+            let filepath = 'C:/ModelWebData/spe_data.txt';
+            get_modelfile(filepath).then(res=>{
+              this.drawer_data=res
+            })
+          },
+
+          /*b.控制是否显示抽屉*/
+          show_drawer(res){
+            if(res.code==200){
+              this.drawer_show=false;
+              this.get_spedata(this.seriesid);
+            }
+          },
         },
     }
 </script>
@@ -551,16 +584,19 @@
       .top_add{
         width: 20%;
         height: 100%;
+        display: flex;
+        text-align: right;
         /*border: 1px solid black;*/
         span{
-          cursor: pointer;
           width: 80px;
+          height: 20px;
           display: block;
+          cursor: pointer;
           text-align: center;
           padding: 5px 8px;
-          font-size: 14px;
+          margin-left: 40px;
           margin-top: 10px;
-          margin-left: 62%;
+          font-size: 14px;
           background: @theme;
           color: white;
           border-radius: 5px;

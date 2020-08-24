@@ -13,11 +13,16 @@ import 'element-ui/lib/theme-chalk/index.css'   /*引入Element ui样式*/
 Vue.config.productionTip = false
 Vue.use(Element);                              /*使用Element ui*/
 
+/*设置网页标题*/
+document.title="深圳市易鹏达科技有限公司-电气宝管理系统"
+
 router.beforeEach(function (to,from,next) {
   let ugrade
   if(document.cookie){
     ugrade = cookie.getCookie(document.cookie).uGrade
     store.commit('get_User',cookie.getCookie(document.cookie).uName)
+    /*console.log(store.state.facserdata)
+    store.commit('get_FacSerData',store.state.facserdata)*/
   }
   /*1.判断是否为登录界面*/
   if (to.path=='/login'){

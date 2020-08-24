@@ -57,6 +57,20 @@
           </tr>
         </tbody>
       </table>
+
+      <!--分页操作-->
+      <div class="page_oper">
+        <ul>
+          <li>首页</li>
+          <li>上一页</li>
+          <li>下一页</li>
+          <li>尾页</li>
+          <li class="page_num">
+            <input type="text"></input>
+          </li>
+          <li>GO</li>
+        </ul>
+      </div>
     </div>
 
 
@@ -373,7 +387,6 @@
       updata_factory,          /*修改厂商*/
       delate_factory          /*删除厂商*/
     } from "../../network/model/facmanage";
-
     import pinyin from "../../assets/js/comm/pinyin";
 
     /*导入组件*/

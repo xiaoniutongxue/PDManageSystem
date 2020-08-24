@@ -78,6 +78,17 @@ export function update_speopt(optdate) {
   })
 }
 
+/*批量添加关系*/
+export function add_sperelbatch(spereldatalist) {
+  return request({
+    method:'POST',
+    url:'/add_sperelbatch',
+    params:{
+      spereldatalist
+    }
+  })
+}
+
 /*添加关系*/
 export function add_sperel(spereldatalist) {
     return request({
@@ -89,6 +100,17 @@ export function add_sperel(spereldatalist) {
     })
 }
 
+/*修改关系*/
+export function update_sperel(spereldatalist) {
+  return request({
+    method:'POST',
+    url:'/update_sperel',
+    params:{
+      spereldatalist
+    }
+  })
+}
+
 /*删除关系*/
 export function del_sperel(relID) {
     return request({
@@ -96,17 +118,6 @@ export function del_sperel(relID) {
         url:'/del_sperel',
         params:{
           relID
-        }
-    })
-}
-
-/*获取所有关系数据*/
-export function get_sperelall(seriesid) {
-    return request({
-        method:'GET',
-        url:'/get_sperelall',
-        params:{
-            seriesid
         }
     })
 }
@@ -231,6 +242,18 @@ export function change_speproporder(spedata) {
     params:{
       spedata
     },
+  })
+}
+
+
+/*本体规格网页数据添加*/
+export function add_spewebdata(spewebdata) {
+  return request({
+    method:'POST',
+    url:'/add_spewebdata',
+    params:{
+      spewebdata
+    }
   })
 }
 

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedState from "vuex-persistedstate"
 
 Vue.use(Vuex)
 
@@ -17,6 +18,8 @@ export default new Vuex.Store({
     },                        /*品牌系列选中数据*/
     sys_date:new Date(),      /*当前系统时间*/
     user:'',                /*登录用户*/
+
+    arr:'',
   },
   mutations: {
     // 1.获取页面加载创建时加载数据
@@ -37,6 +40,10 @@ export default new Vuex.Store({
       state.user=name
     },
 
+    get_arr(state,arr){
+      state.arr=arr
+    },
+
   },
   getters:{
     /*获取当前系统格式*/
@@ -46,7 +53,7 @@ export default new Vuex.Store({
       if(month<10){
         month='0'+month;
       }
-      let day=state.sys_date.getDay()+2;
+      let day=state.sys_date.getDate();
       if (day<10){
         day='0'+day;
       }
@@ -60,5 +67,6 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-  }
+  },
+  /*plugins: [createPersistedState()]*/
 })

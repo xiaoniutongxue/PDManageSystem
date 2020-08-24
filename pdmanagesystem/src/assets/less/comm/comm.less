@@ -47,6 +47,7 @@ table{
 
 /*dilog对话框*/
 .dialog{
+  /*width:40%;*/
   ul{
     width: 90%;
     height: auto;
@@ -90,6 +91,22 @@ table{
   }
 }
 
+/*选项选中样式*/
+.changeColor{
+  color: @theme;
+}
+
+/*抽屉*/
+.drawer{
+  .dreawer_div{
+    width: 95%;
+    height: 100vh;
+    overflow: auto;
+    margin: 10px auto;
+    /*border: 1px solid red;*/
+  }
+}
+
 /*数据为空时显示*/
 .null{
   width: 100%;
@@ -97,4 +114,21 @@ table{
   margin-top: 20px;
   font-size: 12px;
   display: block;
+}
+
+
+/*滚动条样式*/
+.scrolle::-webkit-scrollbar{
+  width: 4px;
+  height: 4px;
+}
+.scrolle::-webkit-scrollbar-thumb{
+  border-radius: 5px;
+  -webkit-box-shadow:inset005pxrgba(0,0,0,0.2);
+  background:rgba(0,0,0,0.2);
+}
+.scrolle::-webkit-scrollbar-track{
+  -webkit-box-shadow:inset005pxrgba(0,0,0,0.2);
+  border-radius:0;
+  background:rgba(0,0,0,0.1);
 }

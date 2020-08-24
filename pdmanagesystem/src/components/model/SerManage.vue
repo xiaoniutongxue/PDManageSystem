@@ -4,22 +4,28 @@
       <div class="ser_top">
         <!--品牌选择-->
         <div class="top_fac">
+          <span>品牌:</span>
           <el-select class="select" v-model="fac_value" size="small" filterable placeholder="请选择品牌">
             <el-option
               v-for="item in fac_data"
               :key="item.value"
               :label="item.label"
+              :title="item.factName"
               @click.native="get_seriesdata(item.factID)"
-              :value="item.factName">
+              :value="item.factName | filterfacname">
             </el-option>
           </el-select>
         </div>
 
         <!--系列查询-->
         <div class="top_ser">
-          <el-input class="input" size="small" v-model="ser_value" placeholder="请输入系列名称"></el-input>
-          <span class="search" @click="search_ser">查询</span>
-          <span class="clear" @click="">重置</span>
+          <el-input class="input" size="small" v-model="ser_value" placeholder="请输入系列名称" v-on:input="search_ser"></el-input>
+          <span class="clear" @click="clear_ser">清空</span>
+          <div class="ser_search" v-show="show_searchres">
+            <ul>
+              <li v-for="serch in search_data" @click="get_sermsg(serch.SeriesId)">{{serch.SeriesName}}</li>
+            </ul>
+          </div>
         </div>
 
         <!--类型添加-->
@@ -139,7 +145,6 @@
           <el-button type="primary" @click="add_type('type')">确 定</el-button>
         </span>
       </el-dialog>
-
       <!--新增系列-->
       <el-dialog
         title="新增系列"
@@ -163,7 +168,6 @@
           <el-button type="primary" @click="add_type('ser')">确 定</el-button>
         </span>
       </el-dialog>
-
       <!--修改类型-->
       <el-dialog
         title="修改类型"
@@ -183,7 +187,6 @@
           <el-button type="primary" @click="update_type('type')">确 定</el-button>
         </span>
       </el-dialog>
-
       <!--修改系列-->
       <el-dialog
         title="修改系列"
@@ -222,12 +225,12 @@
         name: "SerManage",
         data(){
           return{
-            /*品牌数据*/
+            // 1.品牌数据
             fac_value:"",
             fac_id:"",
             fac_data:"",
 
-            /*系列数据*/
+            // 2.系列数据
             ser_data:"",
             ser_value:"",
             ser_id:'',
@@ -235,17 +238,21 @@
             ser_seltedid:0,
             ser_parentid:0,
 
-            /*dilog开关*/
+            // 3.dilog开关
             addtype_dilog:false,
             addser_dilog:false,
             updatetype_dilog:false,
             updateser_dilog:false,
             ser_shortinput:false,
 
-            /*输入框绑定值*/
+            // 4.输入框绑定值
             type_val:'',
             ser_val:'',
             ser_shortval:'',
+
+            // 5.系列查询数据
+            search_data:[],
+            show_searchres:false,
           }
         },
         created() {
@@ -285,15 +292,16 @@
               get_seriesdata(factid).then(res=>{
                 this.ser_data=res;
                 /*默认选中*/
-                if(this.ser_seltedid==0){
-                  this.ser_seltedid=res[0].SeriesId
+                if(this.ser_seltedid==0 && res.length>0){
+                    this.ser_seltedid=res[0].SeriesId
                 }
               })
           },
 
           /*c.得到左边选择的系列数据*/
           get_sermsg(seriesid){
-            this.ser_msgdata=[]
+            this.ser_msgdata=[];
+            this.show_searchres=false;
             for(let i=0;i<this.ser_data.length;i++){
               if(this.ser_data[i].SeriesId==seriesid){
                 this.ser_msgdata.push(this.ser_data[i])
@@ -387,14 +395,6 @@
               seriesdata.SeriesName=this.type_val;
             }else{
               seriesdata.SeriesName=this.ser_val;
-              if(this.ser_shortval==''){
-                this.$message({
-                  type:'warning',
-                  message:"请输入简称",
-                  duration:1000
-                })
-                return
-              }
             }
             if(seriesdata.SeriesName==''){
               this.$message({
@@ -437,14 +437,6 @@
               seriesdata.SeriesName=this.type_val;
             }else{
               seriesdata.SeriesName=this.ser_val;
-              if(this.ser_shortval==''){
-                this.$message({
-                  type:'warning',
-                  message:"请输入简称",
-                  duration:1000
-                })
-                return
-              }
             }
             if(seriesdata.SeriesName==''){
               this.$message({
@@ -508,10 +500,48 @@
           },
 
           // 6.系列搜索框
+          /*系列搜索*/
           search_ser(){
-            /*console.log(this.ser_value)*/
+            if(this.ser_value==''){
+              this.show_searchres=false;
+            }else{
+              this.show_searchres=true;
+            }
+            let seardata=[]
+            for(let i=0;i<this.ser_data.length;i++){
+              if(this.ser_data[i].SeriesName.indexOf(this.ser_value)!=-1){
+                seardata.push(this.ser_data[i])
+              }
+              for(let j=0;j<this.ser_data[i].child.length;j++){
+                if(this.ser_data[i].child[j].SeriesName.indexOf(this.ser_value)!=-1){
+                  seardata.push(this.ser_data[i].child[j])
+                }
+                for(let z=0;z<this.ser_data[i].child[j].child.length;z++){
+                  if(this.ser_data[i].child[j].child[z].SeriesName.indexOf(this.ser_value)!=-1){
+                    seardata.push(this.ser_data[i].child[j].child[z])
+                  }
+                }
+              }
+            }
+            this.search_data=seardata
           },
-      }
+
+          /*清空系列搜索框*/
+          clear_ser(){
+            this.ser_value='';
+            this.show_searchres=false;
+          },
+      },
+        filters:{
+         filterfacname(value){
+           if(value.length>=15){
+             let result = value.substring(0,15)
+             return result+'...'
+           }else{
+             return value
+           }
+         }
+       }
     }
 </script>
 
@@ -530,20 +560,25 @@
       background: #e5e5e5;
       /*厂商查询*/
       .top_fac{
-        width: 20%;
+        width: 22%;
         height: 100%;
         /*border: 1px solid black;*/
+        span{
+          font-size: 12px;
+          margin-left: 10px;
+        }
         .select{
-          width: 90%;
+          width: 85%;
           margin-top: 10px;
-          margin-left: 20px;
+          margin-left: 5px;
         }
       }
       /*系列查询*/
       .top_ser{
-        width: 25%;
+        width: 35%;
         height: 100%;
         display: flex;
+        position: relative;
         /*border: 1px solid black;*/
         .input{
           width: 65%;
@@ -565,10 +600,38 @@
           margin-left: 10px;
           -webkit-user-select: none;
         }
+        .ser_search{
+          width: 65%;
+          min-height: 100px;
+          max-height: 600px;
+          overflow: auto;
+          position: absolute;
+          top: 45px;
+          left: 20px;
+          background: white;
+          /*border: 1px solid black;*/
+          ul{
+            width: 100%;
+            height: auto;
+            list-style: none;
+            li{
+              width: 95%;
+              height: 25px;
+              font-size: 12px;
+              margin-left: 5%;
+              line-height: 25px;
+              cursor: pointer;
+              /*border: 1px solid black;*/
+            }
+            li:hover{
+              color: @theme;
+            }
+          }
+        }
       }
       /*添加新类型*/
       .top_add{
-        width: 55%;
+        width: 43%;
         height: 100%;
         text-align: right;
         /*border: 1px solid black;*/
@@ -580,7 +643,7 @@
           padding: 5px 8px;
           font-size: 14px;
           margin-top: 10px;
-          margin-left: 87%;
+          margin-left: 80%;
           background: @theme;
           color: white;
           border-radius: 5px;
@@ -600,6 +663,7 @@
       .cont-left{
         width: 20%;
         height: 100%;
+        overflow: auto;
         border: 1px solid @tbl-bor;
         h3{
           width: 100%;
@@ -609,8 +673,8 @@
           border-bottom: 1px solid @tbl-bor;
         }
         ul{
-          width: 90%;
-          margin-left: 10%;
+          width: 95%;
+          margin-left: 5%;
           font-size: 12px;
           cursor: pointer;
           list-style: none;

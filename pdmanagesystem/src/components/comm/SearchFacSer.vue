@@ -7,8 +7,9 @@
           v-for="item in fac_data"
           :key="item.value"
           :label="item.label"
+          :title="item.factName"
           @click.native="get_serdata(item.factID,item.factName)"
-          :value="item.factName">
+          :value="item.factName | filterfacname">
         </el-option>
       </el-select>
 
@@ -33,6 +34,7 @@
             <span class="null" v-if="partit.child==''">该系列暂未添加数据</span>
             <li v-for="paropt in partit.child" @click="get_facserid(paropt)">
               {{paropt.SeriesName}}
+              {{paropt.SeriesId}}
             </li>
           </ul>
         </div>
@@ -63,7 +65,7 @@
             ser_pardata:[],        /*系列详情数据*/
 
             // 3.品牌和系列数据
-            facseroridata:{
+            facser_data:{
               fac_id:'',
               fac_name:'',
               ser_id:'',
@@ -72,15 +74,17 @@
           }
         },
         created() {
+          /*1.获取品牌*/
           this.get_facdata();
         },
         watch:{
-          facseroridata:{
+          facser_data:{
             deep:true,
             handler(newVal){
+              /*console.log(newVal)*/
               this.$store.commit('get_FacSerData',newVal)
             },
-          },
+          }
         },
         computed:{
           facserdata(){
@@ -93,30 +97,32 @@
           get_facdata(){
             get_factorydata().then(res=>{
               this.fac_data=res;
-              if(this.facseroridata.fac_id===''){
+              if(this.facserdata.fac_id===''){
                 this.fac_value=res[0].factName;
                 this.get_serdata(res[0].factID,res[0].factName);
               }else{
-                this.fac_value=this.facseroridata.fac_name;
-                this.get_serdata(this.facseroridata.fac_id,this.facseroridata.fac_name);
+                this.fac_value=this.facserdata.fac_name;
+                this.get_serdata(this.facserdata.fac_id,this.facserdata.fac_name);
               }
             })
           },
 
           /*b.获取系列*/
           get_serdata(factid,factName){
-            this.facseroridata.fac_id=factid;
-            this.facseroridata.fac_name=factName;
             get_seriesdata(factid).then(res=>{
               this.ser_data=res;
               if(res.length>0){
-                if(this.facseroridata.ser_id===''){
-                  this.get_facserid(res[0].child[0].child[0])
+                if(this.facserdata.ser_id==='' || this.facserdata.fac_id!=factid){
+                  this.ser_value=res[0].child[0].child[0].SeriesName;
+                  this.facser_data.ser_id=res[0].child[0].child[0].SeriesId;
+                  this.facser_data.ser_name=res[0].child[0].child[0].SeriesName;
                 }else{
-                  this.ser_value=this.facseroridata.ser_name;
+                  this.facser_data.ser_id=this.facserdata.ser_id;
+                  this.facser_data.ser_name=this.facserdata.ser_name;
+                  this.ser_value=this.facserdata.ser_name;
                 }
-              }else{
-                this.ser_value=''
+                this.facser_data.fac_id=factid;
+                this.facser_data.fac_name=factName;
               }
             })
           },
@@ -131,10 +137,20 @@
           get_facserid(pardata){
             this.ser_value=pardata.SeriesName;
             this.ser_parshow=false;
-            this.facseroridata.ser_id=pardata.SeriesId;
-            this.facseroridata.ser_name=pardata.ShortName;
+            this.facser_data.ser_id=pardata.SeriesId;
+            this.facser_data.ser_name=pardata.SeriesName;
           },
         },
+        filters:{
+          filterfacname(value){
+            if(value.length>=15){
+              let result = value.substring(0,15)
+              return result+'...'
+            }else{
+              return value
+            }
+          }
+        }
     }
 </script>
 
@@ -166,12 +182,13 @@
       margin-left: 5px;
     }
     .serpar{
-      width: 600px;
+      width: 700px;
       min-height: 300px;
-      height: auto;
+      max-height: 600px;
+      overflow: auto;
       position: absolute;
       top: 50px;
-      left: 610px;
+      left: 605px;
       z-index: 1;
       border-radius: 10px;
       background: white;
@@ -193,7 +210,7 @@
           justify-content: space-between;
           list-style: none;
           li{
-            width: 30%;
+            width: 32%;
             font-size: 12px;
             line-height: 20px;
             margin-bottom: 5px;
@@ -211,7 +228,7 @@
         }
         ul:after{
           content: '';
-          width: 30%;
+          width: 32%;
         }
       }
     }

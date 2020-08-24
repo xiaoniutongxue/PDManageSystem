@@ -39,10 +39,14 @@
             <el-submenu index="1-1">
               <template slot="title">品牌系列管理</template>
               <router-link to="/index/facmanage">
-                <el-menu-item index="1-1-1">品牌管理</el-menu-item>
+                <el-menu-item index="1-1-1">
+                  品牌管理
+                </el-menu-item>
               </router-link>
               <router-link to="/index/sermanage">
-                <el-menu-item index="1-1-2">系列管理</el-menu-item>
+                <el-menu-item index="1-1-2">
+                  系列管理
+                </el-menu-item>
               </router-link>
             </el-submenu>
             <el-submenu index="1-2">
@@ -92,7 +96,7 @@
             <router-link to="/index/sysusermanage">
               <el-menu-item index="3-1">管理员信息</el-menu-item>
             </router-link>
-            <router-link to="/index/parammanage">
+            <router-link to="/index/sysuserpwd">
               <el-menu-item index="3-2">密码修改</el-menu-item>
             </router-link>
           </el-submenu>
@@ -233,10 +237,17 @@
       .cont_left{
         width: 12%;
         height: 100%;
+        max-height: 100%;
+        overflow: auto;
         background: #222;
+        .el-menu-item{
+          min-width: 160px !important;
+        }
         a{
+          width: 100%;
           color: white;
           text-decoration: none;
+          background: red;
         }
       }
 

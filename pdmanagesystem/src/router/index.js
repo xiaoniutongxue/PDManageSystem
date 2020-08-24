@@ -19,6 +19,7 @@ import AccDataManage from "../components/model/AccDataManage";              /*�
 import AccRelManage from "../components/model/AccRelManage";                /*附件关系*/
 import AccPriceManage from "../components/model/AccPriceManage";            /*附件价格*/
 import ParamDataManage from "../components/model/ParamDataManage";          /*特性参数*/
+import SpeRelManagenew from "../components/model/SpeRelManagenew";
 import test from "../components/model/test";
 
 
@@ -98,6 +99,10 @@ const routes=[
       {
         path: '/index/sysusererr',
         component: UserErr
+      },
+      {
+        path: '/index/sysuserpwd',
+        component: SpeRelManagenew
       },
       /*测试*/
       {

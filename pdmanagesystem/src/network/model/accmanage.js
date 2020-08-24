@@ -110,11 +110,33 @@ export function del_accoptdata(optId) {
   })
 }
 
+/*批量添加关系*/
+export function add_accrelbatch(accreldatalist) {
+  return request({
+    method:'POST',
+    url:'/add_accrelbatch',
+    params:{
+      accreldatalist
+    }
+  })
+}
+
 /*添加关系*/
 export function add_accrel(accreldatalist) {
   return request({
     method:'POST',
     url:'/add_accrel',
+    params:{
+      accreldatalist
+    }
+  })
+}
+
+/*修改关系*/
+export function update_accrel(accreldatalist) {
+  return request({
+    method:'POST',
+    url:'/update_accrel',
     params:{
       accreldatalist
     }
