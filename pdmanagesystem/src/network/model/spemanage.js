@@ -57,11 +57,12 @@ export function add_speopt(optdata) {
 }
 
 /*删除选项*/
-export function del_speopt(optid) {
+export function del_speopt(seriesid,optid) {
     return request({
         method:'GET',
         url:'/del_speopt',
         params:{
+            seriesid,
             optid
         }
     })
@@ -100,6 +101,17 @@ export function add_sperel(spereldatalist) {
     })
 }
 
+/*本体规格根据价格自动生成关系*/
+export function get_dysperel(seriesid) {
+  return request({
+    method:'GET',
+    url:'/get_dysperel',
+    params:{
+      seriesid
+    }
+  })
+}
+
 /*修改关系*/
 export function update_sperel(spereldatalist) {
   return request({
@@ -111,7 +123,7 @@ export function update_sperel(spereldatalist) {
   })
 }
 
-/*删除关系*/
+/*根据关系id删除关系*/
 export function del_sperel(relID) {
     return request({
         method:'GET',
@@ -121,6 +133,20 @@ export function del_sperel(relID) {
         }
     })
 }
+
+/*根据被影响项删除关系*/
+export function del_sperelf(seriesid, fpropid) {
+  return request({
+    method:'GET',
+    url:'/del_sperelf',
+    params:{
+      seriesid,
+      fpropid
+    }
+  })
+}
+
+del_sperelf
 
 /*获取本体规格所有的关系(前端可视化)*/
 export function get_sperelview(seriesid) {
@@ -256,6 +282,7 @@ export function add_spewebdata(spewebdata) {
     }
   })
 }
+
 
 
 

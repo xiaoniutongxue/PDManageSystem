@@ -78,33 +78,36 @@ export function update_accoptdata(optdata) {
 }
 
 /*删除附件类型数据*/
-export function del_acctypedata(typeId) {
+export function del_acctypedata(seriesid,typeId) {
   return request({
     method:'GET',
     url:'/del_acctypedata',
     params:{
+      seriesid,
       typeId
     }
   })
 }
 
 /*删除附件标题数据*/
-export function del_accpropdata(propId) {
+export function del_accpropdata(seriesid,propId) {
   return request({
     method:'GET',
     url:'/del_accpropdata',
     params:{
+      seriesid,
       propId
     }
   })
 }
 
 /*删除附件选项数据*/
-export function del_accoptdata(optId) {
+export function del_accoptdata(seriesid,optId) {
   return request({
     method:'GET',
     url:'/del_accoptdata',
     params:{
+      seriesid,
       optId
     }
   })

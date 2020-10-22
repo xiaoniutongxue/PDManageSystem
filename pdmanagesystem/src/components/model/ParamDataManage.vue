@@ -6,13 +6,13 @@
         <div class="top_search">
           <SearchFacSer>
             <span>类型:</span>
-            <el-select class="type" size="small" v-model="typeval" placeholder="请选择">
+            <el-select class="type" size="small" v-model="Type_name" placeholder="请选择">
               <el-option
-                v-for="item in paramdata"
+                v-for="item in Param_Data"
                 :key="item.typeId"
                 :label="item.typeName"
                 :value="item.typeName"
-                @click.native="get_propdate(item.typeId)"
+                @click.native="get_propdate(item)"
               />
             </el-select>
           </SearchFacSer>
@@ -25,10 +25,10 @@
       </div>
 
       <!--特性参数内容-->
-      <div class="param-cont">
+      <div class="param-cont" v-for="type in Param_Data" v-if="type.typeId==Type_id">
         <!--特性参数头部类型-->
-        <div class="cont-top" v-if="typeval!=''">
-          <h3>{{typeval}}</h3>
+        <div class="cont-top">
+          <h3>{{type.typeName}}</h3>
           <div class="oper">
             <span @click="show_addp">新增标题</span>
             <span @click="show_updatet">修改</span>
@@ -37,12 +37,12 @@
         </div>
 
         <!--特性参数选项数据-->
-        <span class="null" v-if="propdata==''">该类型暂未添加数据</span>
-        <div class="cont-item" v-for="prop in propdata">
+        <!--<span class="null" v-if="propdata==''">该类型暂未添加数据</span>-->
+        <div class="cont-item" v-for="prop in type.child">
           <!--选项标题-->
           <div class="prop">
             <div class="tit">
-              <h3>{{prop.typeName}}</h3>
+              <h3>{{prop.propName}}</h3>
             </div>
             <div class="oper">
               <div class="rel">
@@ -70,9 +70,9 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-if="prop.child==''">
+              <!--<tr v-if="prop.child==''">
                 <td colspan="7">该标题暂未添加数据</td>
-              </tr>
+              </tr>-->
               <tr v-for="opt in prop.child">
                 <td>{{opt.optId}}</td>
                 <td>{{opt.optName}}</td>
@@ -108,12 +108,12 @@
       <el-dialog class="dialog" title="添加标题" :visible.sync="dilog_addp" width="30%">
         <ul>
           <li class="textli">
-            <span>类型名称:</span>
-            <el-input class="input" v-model="typename" size="small" placeholder="请输入类型名称"/>
+            <span>标题名称:</span>
+            <el-input class="input" v-model="propname" size="small" placeholder="请输入标题名称"/>
           </li>
           <li>
             <span>关联本体项:</span>
-            <el-select class="select" v-model="propsperelid" size="small" placeholder="请选择">
+            <el-select class="select" v-model="spe_relid" size="small" placeholder="请选择">
               <el-option
                 label="无"
                 value="-1">
@@ -130,7 +130,7 @@
 
         <span slot="footer" class="dialog-footer">
             <el-button @click="dilog_addp = false">取 消</el-button>
-            <el-button type="primary" @click="add_paramt">确 定</el-button>
+            <el-button type="primary" @click="add_paramp">确 定</el-button>
           </span>
       </el-dialog>
       <el-dialog class="dialog" title="添加选项" :visible.sync="dilog_addo" width="30%">
@@ -166,18 +166,18 @@
 
         <span slot="footer" class="dialog-footer">
             <el-button @click="dilog_updatet = false">取 消</el-button>
-            <el-button type="primary" @click="update_paramt('fir')">确 定</el-button>
+            <el-button type="primary" @click="update_paramt()">确 定</el-button>
           </span>
       </el-dialog>
       <el-dialog class="dialog" title="修改标题" :visible.sync="dilog_updatep" width="30%">
         <ul>
           <li class="textli">
-            <span>类型名称:</span>
-            <el-input class="input" v-model="typename" size="small" placeholder="请输入类型名称"/>
+            <span>标题名称:</span>
+            <el-input class="input" v-model="propname" size="small" placeholder="请输入标题名称"/>
           </li>
           <li>
             <span>关联本体项:</span>
-            <el-select class="select" v-model="propsperelid" size="small" placeholder="请选择">
+            <el-select class="select" v-model="spe_relid" size="small" placeholder="请选择">
               <el-option
                 label="无"
                 value="-1">
@@ -194,7 +194,7 @@
 
         <span slot="footer" class="dialog-footer">
             <el-button @click="dilog_updatep = false">取 消</el-button>
-            <el-button type="primary" @click="update_paramt('sec')">确 定</el-button>
+            <el-button type="primary" @click="update_paramp()">确 定</el-button>
           </span>
       </el-dialog>
       <el-dialog class="dialog" title="修改选项" :visible.sync="dilog_updateo" width="30%">
@@ -240,20 +240,17 @@
         name: "ParamDataManage",
         data(){
           return{
-            // id
-            propsperelid:'',
-            typeid:'',                /*类型id*/
-            propid:'',                /*类型标题id*/
-            parentid:'',              /*父id*/
+            // 1.特性参数数据
+            Param_Data:[],             /*所有特性参数数据*/
 
-            /*特性参数数据*/
-            paramdata:[],             /*所有特性参数数据*/
-            propdata:'',              /*标题数据*/
+            // 2.类型数据
+            Type_id:'',                /*类型id*/
+            Type_name:'',             /*类型名称*/
 
-            /*本体数据*/
+            // 3.本体数据
             spe_data:[],              /*本体规格数据*/
 
-            // dilog开关
+            // 4.dilog开关
             dilog_addt:false,         /*控制显示添加类型*/
             dilog_addp:false,         /*控制显示添加标题*/
             dilog_addo:false,         /*控制显示添加选项*/
@@ -261,8 +258,7 @@
             dilog_updatep:false,      /*控制显示修改标题*/
             dilog_updateo:false,      /*控制显示修改选项*/
 
-            /*输入框绑定值*/
-            typeval:'',               /*类型值*/
+            // 5.输入框绑定值
             typename:'',              /*类型名称*/
             propname:'',              /*标题名称*/
             optid:'',                 /*选项id*/
@@ -270,29 +266,19 @@
             optval:'',                /*选项值*/
             optunit:'',               /*选项单位*/
 
+            // 6.关联本体
+            spe_relid:'',             /*关联本体层级(选择哪个选项)*/
           }
         },
+        created(){
+          this.get_paramdata(this.seriesid);      /*获取特性参数数据*/
+          this.get_spedata(this.seriesid);         /*获取本体数据*/
+        },
         watch:{
-          /*监听系列*/
+          /*监听系列id*/
           seriesid(newVal){
-            this.get_paramdata(newVal);
-            this.get_spedata(newVal)
-          },
-          /*监听特性参数*/
-          paramdata(newVal){
-            if(newVal){
-              if(this.typeid){
-                this.get_propdate(this.typeid)
-              }else{
-                if(newVal.length>0){
-                  this.typeval=newVal[0].typeName
-                  this.get_propdate(newVal[0].typeId)
-                }
-              }
-            }else{
-              this.typeval="";
-              this.typeid='';
-            }
+            this.get_paramdata(newVal);      /*获取特性参数数据*/
+            this.get_spedata(newVal);         /*获取本体数据*/
           },
         },
         computed:{
@@ -328,82 +314,81 @@
         },
         methods:{
           // 1.获取数据
-          /*b.获取本体数据*/
+          /*a.获取本体数据*/
           get_spedata(seriesid){
             get_spedata(seriesid).then(res=>{
               this.spe_data=res
             })
           },
 
-          /*c.获取特性参数所有数据*/
+          /*b.获取特性参数所有数据*/
           get_paramdata(seriesid){
             get_paramdata(seriesid).then(res=>{
-              this.paramdata=res;
+              this.Param_Data=res;
+              if(res.length>0){
+                if(this.Type_id===''){
+                  this.Type_id=res[0].typeId;
+                  this.Type_name=res[0].typeName;
+                }else{
+                  for(let i=0;i<res.length;i++){
+                    if(this.typename===res[i].typeName){
+                      this.Type_id=res[i].typeId;
+                      this.Type_name=res[i].typeName;
+                    }
+                  }
+                }
+              }
             })
           },
 
-          /*d.获取特性参数内容数据*/
-          get_propdate(typeid){
-            this.typeid=typeid;
-            this.propdata=[];
-            for(let i=0;i<this.paramdata.length;i++){
-              if(this.paramdata[i].typeId==typeid){
-                this.propdata=this.paramdata[i].child
-              }
-            }
+          /*c.获取特性参数内容数据*/
+          get_propdate(typedata){
+            this.Type_id=typedata.typeId;
+            this.Type_name=typedata.typeName;
           },
 
           // 2.显示对话框
-          /*添加特性参数类型*/
+          /*a.添加特性参数类型*/
           show_addt(){
             this.typename='';
-            this.parentid=-1;
-            this.propsperelid='-1';
             this.dilog_addt=true;
           },
 
-          /*添加特性参数标题*/
+          /*b.添加特性参数标题*/
           show_addp(){
-            this.typename="";
-            this.parentid=this.typeid;
-            this.propsperelid='-1';
+            this.propname="";
+            this.spe_relid='-1';
             this.dilog_addp=true;
           },
 
-          /*添加特性参数选项*/
+          /*c.添加特性参数选项*/
           show_addo(typeid){
             this.optname="";
             this.optval="";
             this.optunit="";
-            this.parentid=typeid;
             this.dilog_addo=true;
           },
 
-          /*修改特性参数类型*/
+          /*d.修改特性参数类型*/
           show_updatet(){
-            this.propid=this.typeid;
-            this.typename=this.typeval;
-            this.parentid=-1;
-            this.propsperelid='-1';
+            this.typename=this.Type_name;
             this.dilog_updatet=true;
           },
 
-          /*修改特性参数类标题*/
+          /*e.修改特性参数类标题*/
           show_updatep(prop){
-            this.propid=prop.typeId;
-            this.typename=prop.typeName;
-            this.parentid=prop.parentId;
+            this.propid=prop.propId;
+            this.propname=prop.propName;
             if(prop.speRelId==-1){
-              this.propsperelid='-1'
+              this.spe_relid='-1'
             }else{
-              this.propsperelid=prop.speRelId;
+              this.spe_relid=prop.speRelId;
             }
             this.dilog_updatep=true;
           },
 
-          /*修改特性参数类型*/
+          /*f.修改特性参数类型*/
           show_updateo(opt){
-            this.parentid=opt.typeId;
             this.optid=opt.optId;
             this.optname=opt.optName;
             this.optval=opt.optValue;
@@ -412,7 +397,7 @@
           },
 
           // 3.添加数据
-          /*添加类型*/
+          /*a.添加类型*/
           add_paramt(){
             if(this.typename==''){
               this.$message({
@@ -425,8 +410,6 @@
             let typedata={}
             typedata={
               typeName:this.typename,
-              parentId:this.parentid,
-              speRelId:this.propsperelid,
               AddUser:this.user,
               AddTime:this.sys_date,
               seriesId:this.seriesid,
@@ -453,7 +436,10 @@
             })
           },
 
-          /*添加选项*/
+          /*b.添加标题*/
+          add_paramp(){},
+
+          /*c.添加选项*/
           add_paramo(){
             if(this.optname==''){
               this.$message({
@@ -470,7 +456,7 @@
               optUnit:this.optunit,
               AddUser:this.user,
               AddTime:this.sys_date,
-              typeId:this.parentid,
+              typeId:this.Type_id,
               seriesId:this.seriesid,
             }
             optdata=JSON.stringify(optdata)
@@ -495,8 +481,8 @@
           },
 
           // 4.修改数据
-          /*修改类型*/
-          update_paramt(grand){
+          /*a.修改类型*/
+          update_paramt(){
             if(this.typename==''){
               this.$message({
                 type:'error',
@@ -507,10 +493,8 @@
             }
             let typedata={}
             typedata={
-              typeId:this.propid,
+              typeId:this.Type_id,
               typeName:this.typename,
-              parentId:this.parentid,
-              speRelId:this.propsperelid,
               AddUser:this.user,
               AddTime:this.sys_date,
               seriesId:this.seriesid,
@@ -524,12 +508,7 @@
                   message:res.message,
                   duration:1000
                 })
-                if(grand=='fir'){
-                  this.typeval=this.typename;
-                  this.dilog_updatet=false;
-                }else{
-                  this.dilog_updatep=false;
-                }
+                this.dilog_updatet=false;
                 this.get_paramdata(this.seriesid);
               }else{
                 this.$message({
@@ -541,7 +520,10 @@
             })
           },
 
-          /*修改选项*/
+          /*b.修改标题*/
+          update_paramp(){},
+
+          /*c.修改选项*/
           update_paramo(){
             if(this.optname==''){
               this.$message({
@@ -557,7 +539,7 @@
               optName:this.optname,
               optValue:this.optval,
               optUnit:this.optunit,
-              typeId:this.parentid,
+              typeId:this.Type_id,
               seriesId:this.seriesid,
             }
             optdata=JSON.stringify(optdata)
@@ -582,8 +564,8 @@
           },
 
           // 5.删除数据
-          /*删除类型*/
-          del_paramt(typeid,grand){
+          /*a.删除类型*/
+          del_paramt(typeid){
             this.$confirm("确认删除该数据及其子项吗？",'提示',{
               confirmButtonText:'确认',
               cancelButtonText:'取消',
@@ -596,9 +578,6 @@
                     message:res.message,
                     duration:1000
                   })
-                  if(grand=='fir'){
-                    this.typeval=''
-                  }
                   this.get_paramdata(this.seriesid);
                 }
               })
@@ -611,7 +590,10 @@
             })
           },
 
-          /*删除选项*/
+          /*b.删除标题*/
+          del_paramp(propid){},
+
+          /*c.删除选项*/
           del_paramo(optid){
             this.$confirm("确认删除该数据及其子项吗？",'提示',{
               confirmButtonText:'确认',

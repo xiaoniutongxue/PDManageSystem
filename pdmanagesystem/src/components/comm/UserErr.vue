@@ -1,6 +1,6 @@
 <template>
     <div class="user_err">
-      该功能只能超级管理员登录!
+      该功能需要超级管理员身份!
     </div>
 </template>
 

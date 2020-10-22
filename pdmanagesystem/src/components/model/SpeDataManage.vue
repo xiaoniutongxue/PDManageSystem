@@ -19,7 +19,7 @@
       <span class="null" v-show="spe_data==''">该系列暂未添加数据</span>
       <div class="data_item" v-for="prop in spe_data">
         <div class="data_prop">
-          <h3>{{prop.propName}}</h3>
+          <h3>{{prop.propName}}({{prop.use_type}})</h3>
           <div class="oper">
             <span @click="show_dilogaddo(prop)">新增选项</span>
             <span @click="show_dilogupdatep(prop)">修改</span>
@@ -71,6 +71,16 @@
           <span>标题名称:</span>
           <el-input v-model="propname" size="small" placeholder="请输入标题名称"/>
         </li>
+        <li>
+          <span>标题类型:</span>
+          <el-select class="select" v-model="proptype" size="small" placeholder="请选择类型">
+            <el-option label="B:本体" value="B"/>
+            <el-option label="C:附件" value="C"/>
+            <el-option label="D:说明" value="D"/>
+            <el-option label="E:订货号" value="E"/>
+            <el-option label="F:无用" value="F"/>
+          </el-select>
+        </li>
       </ul>
 
       <span slot="footer" class="dialog-footer">
@@ -113,6 +123,16 @@
             <el-option label=" " value=" "/>
             <el-option label="-" value="-"/>
             <el-option label="/" value="/"/>
+          </el-select>
+        </li>
+        <li>
+          <span>标题类型:</span>
+          <el-select class="select" v-model="proptype" size="small" placeholder="请选择类型">
+            <el-option label="B:本体" value="B"/>
+            <el-option label="C:附件" value="C"/>
+            <el-option label="D:说明" value="D"/>
+            <el-option label="E:订货号" value="E"/>
+            <el-option label="F:无用" value="F"/>
           </el-select>
         </li>
       </ul>
@@ -187,6 +207,7 @@
             propid:'',             /*标题id*/
             propname:'',           /*标题绑定值*/
             propcode:'',           /*连接符*/
+            proptype:'',           /*类型*/
             optid:'',              /*选项绑定id*/
             optname:'',            /*选项绑定值名称*/
             optvalue:'',           /*选项绑定值*/
@@ -244,6 +265,7 @@
           /*a.控制添加标题*/
           show_dilogaddp(){
             this.propname="";
+            this.proptype='B';
             this.dilog_addp=true;
           },
 
@@ -258,6 +280,7 @@
 
           /*c.控制修改标题*/
           show_dilogupdatep(prop){
+            this.proptype=prop.use_type;
             this.propname=prop.propName;
             this.propcode=prop.propCode;
             this.propid=prop.propId;
@@ -293,11 +316,13 @@
                 {
                   seriesid:this.seriesid,
                   propname:propnamelist[i],
+                  proptype:this.proptype,
                   propCode:'无'
                 }
               )
             }
             propdata=JSON.stringify(propdata)
+            /*console.log(propdata)*/
             add_speprop(propdata).then(res=>{
               if(res.code==200){
                 this.$message({
@@ -373,6 +398,7 @@
             let propdata={}
             propdata.propName=this.propname;
             propdata.propId=this.propid;
+            propdata.proptype=this.proptype;
             propdata.propCode=this.propcode;
             propdata.seriesid=this.seriesid;
             propdata=JSON.stringify(propdata)
@@ -465,7 +491,7 @@
               cancelButtonText:'取消',
               type:'warning'
             }).then(()=>{
-              del_speopt(optId).then(res=>{
+              del_speopt(this.seriesid,optId).then(res=>{
                 if(res.code==200){
                   this.get_spedata(this.seriesid);
                   this.$message({

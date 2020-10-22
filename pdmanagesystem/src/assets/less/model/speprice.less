@@ -51,6 +51,7 @@
     .cont-right{
       width: 78%;
       height: 99%;
+      overflow: auto;
       border: 1px solid @tbl-bor;
       /*头部型号名称价格*/
       .right-top{
@@ -97,6 +98,31 @@
             }
           }
         }
+      }
+      /*价格表格*/
+      .right-cont{
+        height: 94%;
+        .page_table{
+          width: 100%;
+          height: 92%;
+          /*border: 1px solid black;*/
+        }
+        .cur_price{
+          width: 100%;
+          height: 3%;
+          /*border: 1px solid black;*/
+          span{
+            font-size: 12px;
+            margin-left: 15px;
+            .span_price{
+              color: red;
+              margin-left: 10px;
+            }
+          }
+        }
+        /*.page_oper{
+          border: 1px solid black;
+        }*/
       }
     }
   }

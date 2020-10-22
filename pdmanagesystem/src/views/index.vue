@@ -21,6 +21,72 @@
     </div>
 
     <!--系统内容-->
+   <!-- <div class="index_cont">
+      &lt;!&ndash;左边导航列表&ndash;&gt;
+      <div class="cont_left">
+        <el-menu
+          :default-active="this.$router.path"
+          router
+          class="el-menu-vertical-demo"
+          background-color="#222"
+          text-color="#fff"
+          active-text-color="#ffd04b">
+          &lt;!&ndash;选项管理&ndash;&gt;
+          <el-submenu index="1">
+            <template slot="title">
+              <i class="el-icon-s-home"/>
+              <span>选型管理</span>
+            </template>
+            <el-submenu index="1-1">
+              <template slot="title">品牌系列管理</template>
+                <el-menu-item index="/index/facmanage">品牌管理</el-menu-item>
+                <el-menu-item index="/index/sermanage">系列管理</el-menu-item>
+            </el-submenu>
+            <el-submenu index="1-2">
+              <template slot="title">本体规格管理</template>
+                <el-menu-item index="/index/spedatamanage">本体数据</el-menu-item>
+                <el-menu-item index="/index/sperelmanage">本体关系</el-menu-item>
+                <el-menu-item index="/index/spepricemanage">本体价格</el-menu-item>
+            </el-submenu>
+            <el-submenu index="1-3">
+              <template slot="title">附件选择管理</template>
+                <el-menu-item index="/index/accdatamanage">附件数据</el-menu-item>
+                <el-menu-item index="/index/accrelmanage">附件关系</el-menu-item>
+                <el-menu-item index="/index/accpricemanage">附件价格</el-menu-item>
+            </el-submenu>
+              <el-menu-item index="/index/parammanage">特性参数管理</el-menu-item>
+          </el-submenu>
+
+          &lt;!&ndash;商城管理&ndash;&gt;
+          <el-menu-item index="2">
+            <i class="el-icon-s-home"/>
+            <span slot="title">商城管理</span>
+          </el-menu-item>
+
+          &lt;!&ndash;系统管理&ndash;&gt;
+          <el-submenu index="3">
+            <template slot="title">
+              <i class="el-icon-s-home"/>
+              <span>系统管理</span>
+            </template>
+            <router-link to="/index/sysusermanage">
+              <el-menu-item index="3-1">管理员信息</el-menu-item>
+            </router-link>
+            <router-link to="/index/sysuserpwd">
+              <el-menu-item index="3-2">密码修改</el-menu-item>
+            </router-link>
+          </el-submenu>
+        </el-menu>
+      </div>
+
+      &lt;!&ndash;右边内容&ndash;&gt;
+      <div class="cont_right">
+        &lt;!&ndash;<div class="right-top">
+          <SearchFacSer/>
+        </div>&ndash;&gt;
+        <router-view></router-view>
+      </div>
+    </div>-->
     <div class="index_cont">
       <!--左边导航列表-->
       <div class="cont_left">
@@ -75,9 +141,6 @@
             </el-submenu>
             <router-link to="/index/parammanage">
               <el-menu-item index="1-4">特性参数管理</el-menu-item>
-            </router-link>
-            <router-link to="/index/test">
-              <el-menu-item index="1-5">测试</el-menu-item>
             </router-link>
           </el-submenu>
 

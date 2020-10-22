@@ -5,21 +5,27 @@
         <!--品牌选择-->
         <div class="top_fac">
           <span>品牌:</span>
-          <el-select class="select" v-model="fac_value" size="small" filterable placeholder="请选择品牌">
-            <el-option
-              v-for="item in fac_data"
-              :key="item.value"
-              :label="item.label"
-              :title="item.factName"
-              @click.native="get_seriesdata(item.factID)"
-              :value="item.factName | filterfacname">
-            </el-option>
+          <el-select v-model="fac_value" class="select" size="small" filterable placeholder="请选择品牌">
+            <!--品牌分组(按字母分组)-->
+            <el-option-group
+              v-for="alp in fac_data"
+              :key="alp.alpha"
+              :label="alp.alpha">
+              <el-option
+                v-for="item in alp.facdata"
+                :key="item.value"
+                :label="item.label"
+                :title="item.factName"
+                @click.native="get_seriesdata(item.factID)"
+                :value="item.factName | filterfacname">
+              </el-option>
+            </el-option-group>
           </el-select>
         </div>
 
         <!--系列查询-->
         <div class="top_ser">
-          <el-input class="input" size="small" v-model="ser_value" placeholder="请输入系列名称" v-on:input="search_ser"></el-input>
+          <el-input class="input" size="small" v-model="ser_value" @click.native="search_ser" placeholder="请输入系列名称" v-on:input="search_ser"></el-input>
           <span class="clear" @click="clear_ser">清空</span>
           <div class="ser_search" v-show="show_searchres">
             <ul>
@@ -67,7 +73,6 @@
         <!--右边系列详情数据-->
         <div class="cont-right">
           <span class="null" v-show="ser_msgdata==''">请先选择需要操作的系列</span>
-
           <div class="par-table" v-if="ser_msgdata!=''">
             <!--右边头部-->
             <div class="right-top">
@@ -97,10 +102,11 @@
                   <tr>
                     <td style="width: 10%">系列id</td>
                     <td style="width: 35%">系列名称</td>
-                    <td style="width: 15%">系列简称</td>
+                    <td style="width: 10%">系列简称</td>
                     <td style="width: 20%">添加时间</td>
                     <td style="width: 10%">添加用户</td>
                     <td style="width: 10%">操作</td>
+                    <td style="width: 5%">是否完善</td>
                   </tr>
                 </thead>
                 <tbody>
@@ -116,6 +122,16 @@
                     <td class="oper">
                       <span @click="show_updatedilog('serthi',senpar.SeriesId,thipar)">修改</span>
                       <span @click="del_serdate(thipar.SeriesId)">删除</span>
+                    </td>
+                    <!--数据是否完善-->
+                    <td>
+                      <el-switch
+                        size="small"
+                        :value="thipar.IsPerfection | get_successdata"
+                        @click.native="update_serisper(thipar)"
+                        active-color="#13ce66"
+                        inactive-color="#ff4949">
+                      </el-switch>
                     </td>
                   </tr>
                 </tbody>
@@ -215,11 +231,12 @@
 
 <script>
      /*导入方法*/
-    import {get_factorydata} from "../../network/model/facmanage";
-    import {get_seriesdata} from "../../network/model/sermanage";
-    import {add_seriesdata} from "../../network/model/sermanage";
-    import {update_seriesdata} from "../../network/model/sermanage";
-    import {delete_seriesdata} from "../../network/model/sermanage";
+    import {get_factorydata} from "../../network/model/facmanage";        /*获取品牌数据*/
+    import {get_seriesdata} from "../../network/model/sermanage";         /*获取系列数据*/
+    import {add_seriesdata} from "../../network/model/sermanage";         /*添加系列数据*/
+    import {update_seriesdata} from "../../network/model/sermanage";      /*修改系列数据*/
+    import {update_serperfect} from "../../network/model/sermanage";      /*修改系列是否完善数据*/
+    import {delete_seriesdata} from "../../network/model/sermanage";      /*删除系列数据*/
 
      export default {
         name: "SerManage",
@@ -228,7 +245,7 @@
             // 1.品牌数据
             fac_value:"",
             fac_id:"",
-            fac_data:"",
+            fac_data:[],
 
             // 2.系列数据
             ser_data:"",
@@ -253,11 +270,14 @@
             // 5.系列查询数据
             search_data:[],
             show_searchres:false,
+
+            //6. 分类
+            alphabet:["常用","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
           }
         },
         created() {
           this.get_factorydata();
-      },
+        },
         computed:{
           /*用户*/
           user(){
@@ -266,11 +286,29 @@
           /*当前系统时间*/
           sys_date(){
             return this.$store.getters.sys_date;
-          }
+          },
+          // 系列选中品牌和id
+          Ser_data(){
+            return this.$store.state.Ser_data;
+          },
         },
         watch:{
+          /*监听品牌id*/
+          fac_id(){
+            this.ser_seltedid=0;
+          },
+          /*监听系列id*/
           ser_data(newVal){
             this.get_sermsg(this.ser_seltedid)
+          },
+          /*监听选中系列id*/
+          ser_seltedid(newVal){
+            let serdata={
+              fac_id:this.fac_id,
+              fac_name:this.fac_value,
+              selectedid:newVal
+            }
+            this.$store.commit('get_SerData',serdata)
           },
         },
         methods:{
@@ -278,10 +316,35 @@
           /*a.获取品牌数据*/
           get_factorydata() {
             get_factorydata().then(res=>{
-              this.fac_data=res
+              if(res.length>0){
+                for(let i=0;i<this.alphabet.length;i++){
+                  let facitem=[]
+                  for(let j=0;j<res.length;j++){
+                    /*查找常用或者按字母分类*/
+                    if(i===0){
+                      if(res[j].IsComm==='Y'){
+                        facitem.push(res[j])
+                      }
+                    }else{
+                      if(this.alphabet[i]===res[j].KeyName.substring(0,1)){
+                        facitem.push(res[j])
+                      }
+                    }
+                  }
+                  this.fac_data.push({
+                    alpha:this.alphabet[i],
+                    facdata:facitem
+                  })
+                }
+              }
               /*设置默认*/
-              this.fac_value=res[0].factName
-              this.get_seriesdata(res[0].factID)
+              if(this.Ser_data.fac_id===''){
+                this.fac_value=res[0].factName
+                this.get_seriesdata(res[0].factID)
+              }else{
+                this.fac_value=this.Ser_data.fac_name;
+                this.get_seriesdata(this.Ser_data.fac_id)
+              }
             })
           },
 
@@ -292,8 +355,10 @@
               get_seriesdata(factid).then(res=>{
                 this.ser_data=res;
                 /*默认选中*/
-                if(this.ser_seltedid==0 && res.length>0){
-                    this.ser_seltedid=res[0].SeriesId
+                if(res.length>0 && this.Ser_data.selectedid===''){
+                  this.ser_seltedid=res[0].SeriesId
+                }else{
+                  this.ser_seltedid=this.Ser_data.selectedid;
                 }
               })
           },
@@ -431,6 +496,7 @@
           },
 
           // 4.修改数据
+          /*修改系列*/
           update_type(grand){
             let seriesdata={}
             if(grand=='type'){
@@ -473,6 +539,26 @@
             })
           },
 
+          /*修改系列数据是否完善*/
+          update_serisper(serdata){
+            let perfection=''
+            if(serdata.IsPerfection==='Y'){
+              perfection='N'
+            }else{
+              perfection='Y'
+            }
+            let seriesdata={
+              SeriesId:serdata.SeriesId,
+              IsPerfection:perfection
+            }
+            seriesdata=JSON.stringify(seriesdata)
+            update_serperfect(seriesdata).then(res=>{
+              if(res.code===200){
+                this.get_seriesdata(this.fac_id)
+              }
+            })
+          },
+
           // 5.删除数据
           del_serdate(seriesid){
             this.$confirm('确认删除该数据及其相关数据, 是否继续?', '提示', {
@@ -502,22 +588,20 @@
           // 6.系列搜索框
           /*系列搜索*/
           search_ser(){
-            if(this.ser_value==''){
-              this.show_searchres=false;
-            }else{
-              this.show_searchres=true;
-            }
+            /*控制显示查询返回框*/
+            this.show_searchres = this.ser_value !== '';
+            /*查找数据*/
             let seardata=[]
             for(let i=0;i<this.ser_data.length;i++){
-              if(this.ser_data[i].SeriesName.indexOf(this.ser_value)!=-1){
+              if(this.ser_data[i].SeriesName.toLowerCase().indexOf(this.ser_value.toLowerCase())!=-1){
                 seardata.push(this.ser_data[i])
               }
               for(let j=0;j<this.ser_data[i].child.length;j++){
-                if(this.ser_data[i].child[j].SeriesName.indexOf(this.ser_value)!=-1){
+                if(this.ser_data[i].child[j].SeriesName.toLowerCase().indexOf(this.ser_value.toLowerCase())!=-1){
                   seardata.push(this.ser_data[i].child[j])
                 }
                 for(let z=0;z<this.ser_data[i].child[j].child.length;z++){
-                  if(this.ser_data[i].child[j].child[z].SeriesName.indexOf(this.ser_value)!=-1){
+                  if(this.ser_data[i].child[j].child[z].SeriesName.toLowerCase().indexOf(this.ser_value.toLowerCase())!=-1){
                     seardata.push(this.ser_data[i].child[j].child[z])
                   }
                 }
@@ -531,8 +615,9 @@
             this.ser_value='';
             this.show_searchres=false;
           },
-      },
+        },
         filters:{
+          /*过滤系列名称*/
          filterfacname(value){
            if(value.length>=15){
              let result = value.substring(0,15)
@@ -540,228 +625,15 @@
            }else{
              return value
            }
-         }
+         },
+         /*过滤数据是否添加完善*/
+          get_successdata(value){
+            return value==='Y'
+          },
        }
     }
 </script>
 
 <style lang="less" scoped>
-  @import "../../assets/less/comm/variable";
-  @import "../../assets/less/comm/comm";
-  .ser_all{
-    width: 100%;
-    height: 100%;
-    /*border: 1px solid black;*/
-    /*头部查询*/
-    .ser_top{
-      width: 100%;
-      height: 50px;
-      display: flex;
-      background: #e5e5e5;
-      /*厂商查询*/
-      .top_fac{
-        width: 22%;
-        height: 100%;
-        /*border: 1px solid black;*/
-        span{
-          font-size: 12px;
-          margin-left: 10px;
-        }
-        .select{
-          width: 85%;
-          margin-top: 10px;
-          margin-left: 5px;
-        }
-      }
-      /*系列查询*/
-      .top_ser{
-        width: 35%;
-        height: 100%;
-        display: flex;
-        position: relative;
-        /*border: 1px solid black;*/
-        .input{
-          width: 65%;
-          margin-top: 10px;
-          margin-left: 20px;
-        }
-        span{
-          cursor: pointer;
-          width: 50px;
-          height: 30px;
-          display: block;
-          color: white;
-          font-size: 12px;
-          text-align: center;
-          line-height: 30px;
-          background: @theme;
-          margin-top: 11px;
-          border-radius: 5px;
-          margin-left: 10px;
-          -webkit-user-select: none;
-        }
-        .ser_search{
-          width: 65%;
-          min-height: 100px;
-          max-height: 600px;
-          overflow: auto;
-          position: absolute;
-          top: 45px;
-          left: 20px;
-          background: white;
-          /*border: 1px solid black;*/
-          ul{
-            width: 100%;
-            height: auto;
-            list-style: none;
-            li{
-              width: 95%;
-              height: 25px;
-              font-size: 12px;
-              margin-left: 5%;
-              line-height: 25px;
-              cursor: pointer;
-              /*border: 1px solid black;*/
-            }
-            li:hover{
-              color: @theme;
-            }
-          }
-        }
-      }
-      /*添加新类型*/
-      .top_add{
-        width: 43%;
-        height: 100%;
-        text-align: right;
-        /*border: 1px solid black;*/
-        span{
-          cursor: pointer;
-          width: 80px;
-          display: block;
-          text-align: center;
-          padding: 5px 8px;
-          font-size: 14px;
-          margin-top: 10px;
-          margin-left: 80%;
-          background: @theme;
-          color: white;
-          border-radius: 5px;
-          /*border: 1px solid black;*/
-        }
-      }
-    }
-    /*系列内容*/
-    .ser_cont{
-      width: 100%;
-      height: 93.5%;
-      margin-top: 0.5%;
-      display: flex;
-      justify-content: space-between;
-      /*border: 1px solid black;*/
-      /*左边列表*/
-      .cont-left{
-        width: 20%;
-        height: 100%;
-        overflow: auto;
-        border: 1px solid @tbl-bor;
-        h3{
-          width: 100%;
-          height: 40px;
-          text-align: center;
-          line-height: 40px;
-          border-bottom: 1px solid @tbl-bor;
-        }
-        ul{
-          width: 95%;
-          margin-left: 5%;
-          font-size: 12px;
-          cursor: pointer;
-          list-style: none;
-          h5:hover{
-            color: @theme;
-          }
-        }
-        .first{
-          margin-top: 10px;
-        }
-        .third{
-          li:hover{
-            color: @theme;
-          }
-        }
-      }
-      /*右边系列详情*/
-      .cont-right{
-        width: 79%;
-        height: 100%;
-        border: 1px solid @tbl-bor;
-        /*公共样式*/
-        .sysoper(@H){
-          width: 15%;
-          font-size: 12px;
-          cursor: pointer;
-          text-align: center;
-          /*border: 1px solid @tbl-bor;*/
-          span{
-            margin-left: 10px;
-            line-height: @H;
-          }
-          span:hover{
-            color: @theme;
-            text-decoration: underline;
-          }
-        }
-        .par-table{
-          width: 100%;
-          height: auto;
-          overflow: auto;
-          max-height: 100%;
-          /*border: 1px solid black;*/
-          /*右边头部*/
-          .right-top{
-            width: 100%;
-            height: 40px;
-            display: flex;
-            margin: 0 auto;
-            border-bottom: 1px solid @tbl-bor;
-            h3{
-              width: 85%;
-              padding-left: 2%;
-              line-height: 40px;
-              /*border: 1px solid black;*/
-            }
-            .oper{
-              .sysoper(40px);
-            }
-          }
-          /*右边内容*/
-          .right_par{
-            width: 99%;
-            margin: 10px auto;
-            border: 1px solid @tbl-bor;
-            .tit{
-              width: 100%;
-              height: 30px;
-              display: flex;
-              background: #dadada;
-              /*border: 1px solid black;*/
-              h6{
-                width: 88%;
-                padding-left: 2%;
-                line-height: 30px;
-              }
-              .oper{
-                .sysoper(30px);
-              }
-            }
-          }
-        }
-      }
-    }
-    .selcol{
-      color: @theme;
-    }
-  }
-
+  @import "../../assets/less/model/series";
 </style>

@@ -7,12 +7,14 @@ export function request(config) {
          baseURL:'http://192.168.2.184:5000/',
     })
 
+    /*请求拦截*/
     instance.interceptors.request.use(config=>{
         return config
     },error=>{
         console.log(error)
     })
 
+    /*响应拦截*/
     instance.interceptors.response.use(res=>{
         return res.data;
     },error=>{

@@ -68,8 +68,6 @@
                 <div class="types-oper">
                   <div class="oper-sel">
                     <span>关联本体项:</span>
-                    <!--Spe_propandopt(type.speRelpId)-->
-                    <!--<span class="val">{{type.speRelpId}}{{type.speRelId}}</span>-->
                     <span class="val">{{Spe_propandopt(type.speRelId)}}</span>
                   </div>
                   <div class="oper-sels">
@@ -97,6 +95,11 @@
                       <span class="val">{{Spe_prop(prop.speRelId)}}</span>
                     </div>
 
+                    <div class="oper-sels">
+                      <span class="sel">是否可选:</span>
+                      <span class="val" v-if="prop.isDisabled==='Y'">是</span>
+                      <span class="val" v-if="prop.isDisabled==='N'">否</span>
+                    </div>
                     <div class="oper-oper">
                       <span @click="show_addodilog(prop)">新增选项</span>
                       <span @click="show_updatepdilog(prop)">修改</span>
@@ -154,6 +157,8 @@
             </li>
             <li v-if="type_showsperel">
               <span>关联本体项:</span>
+              <!--:show-all-levels="false"
+              ,multiple: true, checkStrictly: true-->
               <el-cascader
                 size="small"
                 v-model="type_sperelid"
@@ -172,6 +177,11 @@
             <li class="textli">
               <span>标题名称:</span>
               <el-input class="input" v-model="prop_name" size="small" placeholder="请输入类型名称"/>
+            </li>
+            <li class="radioli">
+              <span>是否可选:</span>
+              <el-radio class="radio" v-model="prop_disable" label="Y">是</el-radio>
+              <el-radio class="radio" v-model="prop_disable" label="N">否</el-radio>
             </li>
             <li>
               <span>关联本体项:</span>
@@ -274,6 +284,11 @@
                 </el-option>
               </el-select>
             </li>
+            <li class="radioli">
+              <span>是否可选:</span>
+              <el-radio class="radio" v-model="prop_disable" label="Y">是</el-radio>
+              <el-radio class="radio" v-model="prop_disable" label="N">否</el-radio>
+            </li>
           </ul>
 
           <span slot="footer" class="dialog-footer">
@@ -361,6 +376,7 @@
             /*6.标题*/
             prop_id:'',              /*选中的标题id*/
             prop_typeid:'',          /*标题类型id*/
+            prop_disable:'',         /*标题是否可选*/
             prop_code:'',            /*连接符*/
             prop_sperelid:-1,        /*关联本体id*/
             prop_name:'',            /*标题名称*/
@@ -550,6 +566,7 @@
           show_addpdilog(parentId){
             this.parentid=parentId;
             this.prop_name='';
+            this.prop_disable='N'
             this.prop_sperelid='-1';
             this.dilog_addp=true;
           },
@@ -580,6 +597,7 @@
             this.prop_name=prop.propName;
             this.dilog_updatep=true;
             this.prop_code=prop.propCode;
+            this.prop_disable=prop.isDisabled;
             if(prop.speRelId==-1){
               this.prop_sperelid='-1'
             }else{
@@ -609,13 +627,14 @@
               })
               return
             }
+            console.log(this.type_sperelid)
             let typedata={
               typeName:this.type_name,
               seriesId:this.seriesid,
               parentId:this.parentid,
               isDisabled:this.type_disable,
-              speRelId:this.type_sperelid[1],
               speRelpId:this.type_sperelid[0],
+              speRelId:this.type_sperelid[1],
               AddUser:this.user,
               AddTime:this.sys_date,
             }
@@ -654,6 +673,7 @@
               seriesid:this.seriesid,
               typeId:this.parentid,
               speRelId:this.prop_sperelid,
+              isDisabled:this.prop_disable,
               propCode:'无',
               propname:this.prop_name
             }
@@ -779,6 +799,7 @@
             propdata.typeId=this.prop_typeid;
             propdata.seriesid=this.seriesid;
             propdata.propId=this.prop_id;
+            propdata.isDisabled=this.prop_disable;
             propdata.propCode=this.prop_code;
             propdata.speRelId=this.prop_sperelid;
             propdata.propName=this.prop_name;
@@ -848,7 +869,7 @@
               cancelButtonText:'取消',
               type:'warning'
             }).then(()=>{
-              del_acctypedata(typeid).then(res=>{
+              del_acctypedata(this.seriesid,typeid).then(res=>{
                 if(res.code==200){
                   this.get_acctypedata(this.seriesid);
                   this.$message({
@@ -874,7 +895,7 @@
               cancelButtonText:'取消',
               type:'warning'
             }).then(()=>{
-              del_accpropdata(propid).then(res=>{
+              del_accpropdata(this.seriesid,propid).then(res=>{
                 if(res.code==200){
                   this.get_acctypedata(this.seriesid);
                   this.$message({
@@ -900,7 +921,7 @@
               cancelButtonText:'取消',
               type:'warning'
             }).then(()=>{
-              del_accoptdata(optid).then(res=>{
+              del_accoptdata(this.seriesid,optid).then(res=>{
                 if(res.code==200){
                   this.get_acctypedata(this.seriesid);
                   this.$message({
@@ -1155,13 +1176,29 @@
                 display: flex;
                 /*border: 1px solid black;*/
                 .oper-sel{
-                  width: 70%;
+                  width: 50%;
                   /*border: 1px solid red;*/
                   span{
                     font-size: 12px;
                     font-weight: bold;
                     line-height: 30px;
                     margin-left: 20px;
+                  }
+                  .val{
+                    font-weight: normal;
+                  }
+                }
+                .oper-sels{
+                  width: 20%;
+                  /*border: 1px solid black;*/
+                  span{
+                    margin-left: 20px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    line-height: 35px;
+                  }
+                  .sel{
+                    margin-left: 31px;
                   }
                   .val{
                     font-weight: normal;

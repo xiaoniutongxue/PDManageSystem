@@ -3,14 +3,20 @@
       <!--厂商搜索-->
       <span class="facname">品牌:</span>
       <el-select v-model="fac_value" class="fac" size="small" filterable placeholder="请选择品牌">
-        <el-option
-          v-for="item in fac_data"
-          :key="item.value"
-          :label="item.label"
-          :title="item.factName"
-          @click.native="get_serdata(item.factID,item.factName)"
-          :value="item.factName | filterfacname">
-        </el-option>
+        <!--品牌分组(按字母分组)-->
+        <el-option-group
+          v-for="alp in fac_data"
+          :key="alp.alpha"
+          :label="alp.alpha">
+          <el-option
+            v-for="item in alp.facdata"
+            :key="item.value"
+            :label="item.label"
+            :title="item.factName"
+            @click.native="get_serdata(item.factID,item.factName)"
+            :value="item.factName | filterfacname">
+          </el-option>
+        </el-option-group>
       </el-select>
 
       <span class="sername">系列:</span>
@@ -32,7 +38,9 @@
           <h3>{{partit.SeriesName}}</h3>
           <ul>
             <span class="null" v-if="partit.child==''">该系列暂未添加数据</span>
-            <li v-for="paropt in partit.child" @click="get_facserid(paropt)">
+            <li v-for="paropt in partit.child"
+                :class="{changeColor:facser_data.ser_id==paropt.SeriesId}"
+                @click="get_facserid(paropt)">
               {{paropt.SeriesName}}
               {{paropt.SeriesId}}
             </li>
@@ -70,7 +78,10 @@
               fac_name:'',
               ser_id:'',
               ser_name:''
-            }
+            },
+
+            //4. 分类
+            alphabet:["常用","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"],
           }
         },
         created() {
@@ -96,7 +107,28 @@
           /*a.获取厂商*/
           get_facdata(){
             get_factorydata().then(res=>{
-              this.fac_data=res;
+              if(res.length>0){
+                for(let i=0;i<this.alphabet.length;i++){
+                  let facitem=[]
+                  for(let j=0;j<res.length;j++){
+                    /*查找常用或者按字母分类*/
+                    if(i===0){
+                      if(res[j].IsComm==='Y'){
+                        facitem.push(res[j])
+                      }
+                    }else{
+                      if(this.alphabet[i]===res[j].KeyName.substring(0,1)){
+                        facitem.push(res[j])
+                      }
+                    }
+                  }
+                  this.fac_data.push({
+                    alpha:this.alphabet[i],
+                    facdata:facitem
+                  })
+                }
+              }
+              /*设置默认值*/
               if(this.facserdata.fac_id===''){
                 this.fac_value=res[0].factName;
                 this.get_serdata(res[0].factID,res[0].factName);
@@ -123,6 +155,10 @@
                 }
                 this.facser_data.fac_id=factid;
                 this.facser_data.fac_name=factName;
+              }else{
+                this.facser_data.ser_id='';
+                this.facser_data.ser_name='';
+                this.ser_value='';
               }
             })
           },
@@ -156,6 +192,7 @@
 
 <style lang="less" scoped>
   @import "../../assets/less/comm/variable";
+  @import "../../assets/less/comm/comm";
   .search_all{
     width: 100%;
     height: 100%;

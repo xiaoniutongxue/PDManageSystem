@@ -36,6 +36,19 @@ export function update_seriesdata(seriesdata) {
   })
 }
 
+
+/*系列修改数据是否完善*/
+export function update_serperfect(seriesdata) {
+  return request({
+    method:'POST',
+    url:'/update_serperfect',
+    params:{
+      seriesdata
+    }
+  })
+}
+
+
 /*系列删除*/
 export function delete_seriesdata(seriesid) {
   return request({

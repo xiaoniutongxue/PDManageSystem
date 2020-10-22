@@ -25,6 +25,7 @@
                       <input :id="prop.propId"
                              class="spe_check"
                              type="checkbox"
+                             ref="firsel"
                              @click="get_checkedspe(i,prop.propId)"/>
                       {{prop.propName}}
                       {{prop.propId}}
@@ -36,7 +37,7 @@
                 <ul>
                   <li v-for="(opt,j) in prop.child">
                     {{opt.optName}}
-                    {{opt.optID}}
+                    {{opt.optId}}
                   </li>
                 </ul>
               </div>
@@ -87,7 +88,7 @@
             </div>
 
             <div class="spe-commit" v-show="spe_ckdlist!=''">
-              <h3 @click="add_batchrel" class="batch">批量生成关系</h3>
+              <!--<h3 @click="add_batchrel" class="batch">批量生成关系</h3>-->
               <h3 @click="add_rel">添加关系</h3>
             </div>
           </div>
@@ -97,26 +98,39 @@
         <div class="rel_showrel">
           <!--头部操作-->
           <div class="showrel-top">
-            <div class="top-left">
-              <h3>关系展示</h3>
-              <span class="left-span">被影响项:</span>
-              <el-select class="left-input" size="small" v-model="rel_fprop" placeholder="请选择">
-                <el-option
-                  :key="-1"
-                  :label="'全部'"
-                  :value="-1">
-                </el-option>
-                <el-option
-                  v-for="item in spe_data"
-                  :key="item.propId"
-                  :label="item.propName"
-                  :value="item.propId">
-                </el-option>
-              </el-select>
-            </div>
+            <ul>
+              <li class="top_tit">
+                <h3>关系展示</h3>
+              </li>
+              <li class="top_input">
+                <span class="left-span">被影响项:</span>
+                <el-select class="input" size="small" v-model="rel_fprop" placeholder="请选择">
+                  <el-option
+                    :key="-1"
+                    :label="'全部'"
+                    :value="-1">
+                  </el-option>
+                  <el-option
+                    v-for="item in spe_data"
+                    :key="item.propId"
+                    :label="item.propName"
+                    :value="item.propId">
+                  </el-option>
+                </el-select>
+              </li>
+              <li class="top_but">
+                <span @click="del_sperelf">删除该项所有关系</span>
+              </li>
+              <li class="top_but">
+                <span @click="get_dysperel">关系生成</span>
+              </li>
+            </ul>
           </div>
 
-          <table>
+          <table
+            v-loading="loading"
+            element-loading-text="关系生成中,请稍等。。。"
+            element-loading-spinner="el-icon-loading">
             <thead>
             <tr>
               <td>影响关系</td>
@@ -143,7 +157,7 @@
                 </td>
               </tr>
             </tbody>
-          </table>
+          </table >
         </div>
       </div>
 
@@ -156,7 +170,9 @@
             <div class="m_relitem" v-for="prop in dilog_mdata">
               <h4>{{prop.propName}}</h4>
               <ul>
-                <li :class="{'changeColor':dilog_mselopt.includes(opt.optId)}" v-for="opt in prop.child">{{opt.optName}}</li>
+                <li :class="{'changeColor':dilog_mselopt.includes(opt.optId)}" v-for="opt in prop.child">
+                  {{opt.optName}}
+                </li>
               </ul>
             </div>
           </div>
@@ -190,7 +206,9 @@
     import {update_sperel} from "../../network/model/spemanage";      /*修改本体关系*/
     import {get_sperelid} from "../../network/model/spemanage";       /*获取本体规格可视化id*/
     import {get_sperelview} from "../../network/model/spemanage";     /*获取本体规格可视化关系*/
-    import {del_sperel} from "../../network/model/spemanage";         /*删除关系*/
+    import {get_dysperel} from "../../network/model/spemanage";       /*根据价格自动生成关系*/
+    import {del_sperel} from "../../network/model/spemanage";         /*根据关系id删除关系*/
+    import {del_sperelf} from "../../network/model/spemanage";        /*根据被影响项删除关系*/
 
     export default {
         name: "SpeRelManage",
@@ -217,6 +235,9 @@
 
             // 5.条件筛选
             rel_fprop:-1,             /*关系筛选被影响项绑定值*/
+
+            //6.logding
+            loading:false
           }
         },
         created(){
@@ -233,15 +254,21 @@
           spe_ckdlist(newVal){
             this.clear_speselect(newVal);
           },
+          /*监听本体数据*/
+          spe_data(){
+            this.$nextTick(function () {
+              this.clear_speselectfir();     /*清空选择勾选*/
+            })
+          },
         },
         computed:{
           /*品牌id*/
           factid(){
-            return this.$store.state.facserdata.fac_id
+            return this.$store.state.facserdata.fac_id;
           },
           /*系列id*/
           seriesid(){
-            return this.$store.state.facserdata.ser_id
+            return this.$store.state.facserdata.ser_id;
           },
         },
         components:{
@@ -284,6 +311,8 @@
             /*获取可视化id关系*/
             get_sperelid(seriesid).then(res=>{
               /*console.log(res)*/
+              /*数据加载中*/
+              this.loading=false
               this.spe_reliddata=res
             })
           },
@@ -347,30 +376,10 @@
                 f++
               }
             }
-            if(m<1 || f<1){
-              return false
-            }else{
-              return true
-            }
+            return !(m < 1 || f < 1);
           },
 
-          /*d.清空选中*/
-          clear_speselect(list){
-            /*清空选中的选项*/
-            this.spe_classData=[]
-            for(let i=0;i<list.length;i++){
-              this.spe_classData.push([])
-            }
-            /*清空选中的单选*/
-            let spe_m=document.getElementsByClassName('spe_M');
-            let spe_f=document.getElementsByClassName('spe_F');
-            for(let i=0;i<spe_m.length;i++){
-              spe_m[i].checked=false
-              spe_f[i].checked=false
-            }
-          },
-
-          /*e.批量生成关系*/
+          /*d.批量生成关系*/
           add_batchrel(){
             let spe_m=document.getElementsByClassName('spe_M');
             let spe_f=document.getElementsByClassName('spe_F');
@@ -386,7 +395,7 @@
             }
           },
 
-          /*f.添加关系*/
+          /*e.添加关系*/
           add_rel(){
             let spe_m=document.getElementsByClassName('spe_M');
             let spe_f=document.getElementsByClassName('spe_F');
@@ -400,6 +409,41 @@
                 duration:1000,
               })
             }
+          },
+
+          /*f.根据价格动态生成关系*/
+          get_dysperel(){
+            this.$confirm("关系生成前请确保价格数据已添加完全!",'提示',{
+              confirmButtonText:'确认',
+              cancelButtonText:'取消',
+              type:'warning'
+            }).then(()=>{
+              /*数据加载中*/
+              this.loading=true
+              get_dysperel(this.seriesid).then(res=>{
+                if(res.code===200){
+                  this.$message({
+                    type:'success',
+                    message:'关系生成成功!',
+                    duration:1500,
+                  })
+                  this.get_spereldata(this.seriesid)
+                }else{
+                  this.loading=false
+                  this.$message({
+                    type:'error',
+                    message:"关系添加失败:"+res.message,
+                    duration:1500,
+                  })
+                }
+              })
+            }).catch(()=>{
+              this.$message({
+                type: 'info',
+                message: '已取消添加',
+                duration:1000
+              });
+            })
           },
 
           /*g.获取需要添加关系的数据*/
@@ -481,57 +525,69 @@
 
           /*h.获取需要批量添加的关系数据*/
           get_addrelbatch(spe_m,spe_f){
+            /*1.获取m获取f的id*/
             let mcomblist=[],fcomb
             for(let i=0;i<spe_m.length;i++){
-              if(spe_m[i].checked==true){
+              if(spe_m[i].checked===true){
                 mcomblist.push(spe_m[i].name)
               }
             }
             for(let i=0;i<spe_f.length;i++){
-              if(spe_f[i].checked==true){
+              if(spe_f[i].checked===true){
                 fcomb=spe_f[i].name
               }
             }
+            /*2.获取mproplist*/
             let mproplist=[],moptlist=[]
             for(let i=0;i<this.spe_data.length;i++){
               for(let j=0;j<mcomblist.length;j++){
                 if(this.spe_data[i].propId==mcomblist[j]){
                   let mpropitem=[],moptitem=[]
                   for(let z=0;z<this.spe_data[i].child.length;z++){
-                    mpropitem.push(this.spe_data[i].propId)
                     moptitem.push(this.spe_data[i].child[z].optId)
                   }
-                  mproplist.push(mpropitem)
+                  mproplist.push(this.spe_data[i].propId)
                   moptlist.push(moptitem)
                 }
               }
             }
-            let multiIdcomb=[],mOptIDscomb=[];
-            let mOptIDscombarr=[],arr;
-            /*判断一对一还是多对一*/
-            if(mproplist.length==1){
-              for(let i=0;i<mproplist[0].length;i++){
-                multiIdcomb.push(mproplist[0][i])
-                mOptIDscombarr.push([moptlist[0][i]])
-              }
-            }else{
-              multiIdcomb = this.get_combdata(mproplist,'prop')
-              mOptIDscomb = this.get_combdata(moptlist,'opt')
-              /*处理mOptIDscomb*/
-              for(let i=0;i<mOptIDscomb.length;i++){
-                arr=mOptIDscomb[i].split(',')
-                mOptIDscombarr.push(arr)
-              }
+
+            /*3.获取multiIdcomb*/
+            let multiIdcomb=''
+            for(let i=0;i<mproplist.length;i++){
+              multiIdcomb = multiIdcomb + '+' +mproplist[i]
             }
-            let spereldata
-            spereldata={
+
+            /*4.获取mOptIDscombarr*/
+            let mOptIDscomb=this.get_combdata(moptlist)
+            let mOptIDscombarr=[]
+            for(let i=0;i<mOptIDscomb.length;i++){
+              let arr
+              if(mOptIDscomb[i].toString().indexOf(',')!==-1){
+                arr=mOptIDscomb[i].split(',')
+              }else{
+                arr=[mOptIDscomb[i]]
+              }
+              mOptIDscombarr.push(arr)
+            }
+
+            /*5.获取fOptIDs*/
+            let fOptIDs=new Array(mOptIDscombarr.length)
+            fOptIDs.fill('')
+            /*6.获取fOptDefaultID*/
+            let fOptDefaultID=new Array(mOptIDscombarr.length)
+            fOptDefaultID.fill(-1)
+            let spereldata={
               seriesid:this.seriesid,
-              multiIdcomb:multiIdcomb,
               mproplist:mproplist,
+              multiIdcomb:multiIdcomb.substring(1,multiIdcomb.length),
               mOptIDscombarr:mOptIDscombarr,
               fpropID:fcomb,
+              fOptIDs:fOptIDs,
+              fOptDefaultID:fOptDefaultID
             }
             spereldata=JSON.stringify(spereldata)
+            /*发送请求，添加数据*/
             add_sperelbatch(spereldata).then(res=>{
               if(res.code==200){
                 this.get_spereldata(this.seriesid)
@@ -542,7 +598,7 @@
           },
 
           /*i.获取组合*/
-          get_combdata(array,type){
+          get_combdata(array){
             let len = array.length;
             if(len>=2){
               let len1=array[0].length
@@ -550,21 +606,44 @@
               let arrey = []
               for(let i=0;i<len1;i++){
                 for(let j=0;j<len2;j++){
-                  if(type=='prop'){
-                    arrey.push(array[0][i]+'+'+array[1][j])
-                  }else{
-                    arrey.push(array[0][i]+','+array[1][j])
-                  }
+                  arrey.push(array[0][i]+','+array[1][j])
                 }
               }
               let arraynew = [arrey]
               for(let i=2;i<array.length;i++){
                 arraynew[i-1]=array[i]
               }
-              return this.get_combdata(arraynew,type)
+              return this.get_combdata(arraynew)
             }else{
               return array[0]
             }
+          },
+
+          /*j.清空添加关系选中*/
+          clear_speselect(list){
+            /*清空选中的选项*/
+            this.spe_classData=[]
+            for(let i=0;i<list.length;i++){
+              this.spe_classData.push([])
+            }
+            /*清空选中的单选*/
+            let spe_m=document.getElementsByClassName('spe_M');
+            let spe_f=document.getElementsByClassName('spe_F');
+            for(let i=0;i<spe_m.length;i++){
+              spe_m[i].checked=false
+              spe_f[i].checked=false
+            }
+          },
+
+          /*k清空选择添加关系*/
+          clear_speselectfir(){
+            /*清空勾选上的本体*/
+            let firsel=document.getElementsByClassName('spe_check')
+            for(let i=0;i<firsel.length;i++){
+              firsel[i].checked=false;
+            }
+            /*清空勾选上的本体数据*/
+            this.spe_ckdlist=[];
           },
 
           // 3.关系修改
@@ -584,13 +663,22 @@
               for(let j=0;j<this.spe_data.length;j++){
                 if(reldata[i].mpropID==this.spe_data[j].propId){
                   mspedata.push(this.spe_data[j])
-                }if(reldata[i].fpropID==this.spe_data[j].propId){
+                }
+                if(reldata[i].fpropID==this.spe_data[j].propId){
                   fspedata.push(this.spe_data[j])
                 }
               }
-              moptsel.push(parseInt(reldata[i].mOptIDs))
+              /*III得到mprop选项集合*/
+              if(reldata[i].mOptIDs.indexOf(',') !== -1){
+                let mOptIDs_list = reldata[i].mOptIDs.split(',')
+                for(let x=0;x<mOptIDs_list.length;x++){
+                  moptsel.push(parseInt(mOptIDs_list[x]))
+                }
+              }else{
+                moptsel.push(parseInt(reldata[i].mOptIDs))
+              }
             }
-            /*III.获取已经添加的被影响项选项*/
+            /*IV.获取已经添加的被影响项选项*/
             if(reldata[0].fOptIDs!=null && reldata[0].fOptIDs!=''){
               let fOptIDs=reldata[0].fOptIDs.split(',')
               this.dilog_fselopt=[]
@@ -600,7 +688,7 @@
             }else{
               this.dilog_fselopt=[]
             }
-            /*IV将数据存入data*/
+            /*VI将数据存入data*/
             this.dilog_mdata=mspedata;
             this.dilog_fdata=fspedata[0];
             this.dilog_mselopt=moptsel;
@@ -651,6 +739,7 @@
           },
 
           // 4.删除数据
+          /*a.根据id删除关系*/
           del_sperel(relID){
             this.$confirm("确认删除该关系吗？",'提示',{
               confirmButtonText:'确认',
@@ -660,6 +749,32 @@
               del_sperel(relID).then(res=>{
                 this.get_spereldata(this.seriesid);
                 if(res.code==200){
+                  this.$message({
+                    type: 'success',
+                    message: '数据删除成功',
+                    duration:1000
+                  });
+                }
+              })
+            }).catch(()=>{
+              this.$message({
+                type: 'info',
+                message: '已取消删除',
+                duration:1000
+              });
+            })
+          },
+
+          /*b.根据被影响项删除关系*/
+          del_sperelf(){
+            this.$confirm("确认删除与该项有关的关系吗？",'提示',{
+              confirmButtonText:'确认',
+              cancelButtonText:'取消',
+              type:'warning'
+            }).then(()=>{
+              del_sperelf(this.seriesid,this.rel_fprop).then(res=>{
+                this.get_spereldata(this.seriesid);
+                if(res.code===200){
                   this.$message({
                     type: 'success',
                     message: '数据删除成功',

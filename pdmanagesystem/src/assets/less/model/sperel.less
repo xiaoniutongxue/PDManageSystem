@@ -119,9 +119,11 @@
           text-align: center;
           /*border: 1px solid black;*/
           h3{
-            width: 35%;
+            width: 100%;
             height: 100%;
+            text-align: right;
             cursor: pointer;
+            padding-right: 20px;
             -webkit-user-select: none;
             /*border: 1px solid black;*/
           }
@@ -158,39 +160,42 @@
         line-height: 40px;
         display: flex;
         border: 1px solid @tbl-bor;
-        /*左边筛选查看关系*/
-        .top-left{
+        ul{
           width: 100%;
           height: 100%;
-          text-align: left;
+          list-style: none;
           display: flex;
-          /*border-right: 1px solid @tbl-bor;*/
+          justify-content: space-between;
           /*border: 1px solid black;*/
-          h3{
+          li{
             width: 20%;
-            padding-left: 5%;
-            /*border: 1px solid red;*/
+            text-align: center;
+            padding-right: 10px;
+            /*border: 1px solid black;*/
+            span{
+              font-size: 12px;
+            }
           }
-          /*span提示*/
-          .left-span{
-            font-size: 12px;
-            margin-left: 20px;
+          /*被影响项选择*/
+          .top_input{
+            width: 40%;
+            .input{
+              margin-left: 20px;
+            }
           }
-          /*下拉框*/
-          .left-input{
-            margin-left: 10px;
-          }
-        }
-        /*右边切换显示形式*/
-        .top-right{
-          width: 20%;
-          span{
-            font-size: 12px;
-            cursor: pointer;
-            margin-left: 20px;
-          }
-          span:hover{
-            color: @theme;
+          /*按钮*/
+          .top_but{
+            width: 15%;
+            span{
+              cursor: pointer;
+              padding: 5px 10px;
+              border-radius: 5px;
+              color: white;
+              background: @theme;
+              text-align: center;
+              -webkit-user-select: none;
+              /*border: 1px solid black;*/
+            }
           }
         }
       }

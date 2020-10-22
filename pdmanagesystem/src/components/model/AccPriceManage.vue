@@ -78,8 +78,8 @@
               <tr v-for="comp in compdata" :class="{compColor:comp.optStr===acc_msgdata.optStr}">
                 <td>{{comp.compId}}</td>
                 <td>{{comp.compName}}</td>
-                <td>{{comp.compPrice}}</td>
                 <td>{{comp.compNumber}}</td>
+                <td>{{comp.compPrice}}</td>
                 <td>{{comp.AddUser}}</td>
                 <td>{{comp.AddTime}}</td>
                 <td class="oper">
@@ -99,6 +99,10 @@
         <li class="textli">
           <span>型号名称:</span>
           <el-input class="short_input" v-model="comp_name" :disabled="true" size="small"/>
+        </li>
+        <li class="textli">
+          <span>订货号:</span>
+          <el-input class="short_input" v-model="comp_ordernum" :disabled="true" size="small"/>
         </li>
         <li class="textli">
           <span>型号价格:</span>
@@ -261,7 +265,6 @@
           /*f.获取勾选上的本体*/
           get_AccchList(checked){
             this.acc_chlist=checked;
-            /*console.log(spe_checked)*/
           },
 
           /*g.获取型号信息*/
@@ -347,6 +350,7 @@
           show_dilogc(comp){
             this.comp_id=comp.compId;
             this.comp_name=comp.compName;
+            this.comp_ordernum=comp.compNumber;
             this.comp_price=comp.compPrice;
             this.dilog_update=true
           },
@@ -363,6 +367,8 @@
             }
             let compdata={
               compId:this.comp_id,
+              compName:this.comp_name,
+              compNumber:this.comp_ordernum,
               compPrice:this.comp_price,
               AddTime:this.sys_date,
               AddUser:this.user

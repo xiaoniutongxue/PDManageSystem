@@ -52,8 +52,10 @@
 
           <!--型号价格内容-->
           <div class="right-cont">
-            <table>
-              <thead>
+            <!--价格数据表格-->
+            <div class="page_table">
+              <table>
+                <thead>
                 <tr>
                   <td style="width: 5%">id</td>
                   <td style="width: 25%">名称</td>
@@ -63,22 +65,35 @@
                   <td style="width: 20%">添加时间</td>
                   <td style="width: 10%">操作</td>
                 </tr>
-              </thead>
-              <tbody>
-                <tr v-for="comp in compdata" :class="{compColor:comp.optStr===spe_msgdata.optStr}">
-                  <td>{{comp.compId}}</td>
-                  <td>{{comp.compName}}</td>
-                  <td>{{comp.compPrice}}</td>
-                  <td>{{comp.compNumber}}</td>
-                  <td>{{comp.AddUser}}</td>
-                  <td>{{comp.AddTime}}</td>
-                  <td class="oper">
-                    <span @click="show_dilogc(comp)">修改</span>
-                    <span @click="del_compdata(comp.compId)">删除</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  <tr v-for="comp in comp_data" :class="{compColor:comp.optStr===spe_msgdata.optStr}">
+                    <td>{{comp.compId}}</td>
+                    <td>{{comp.compName}}</td>
+                    <td>{{comp.compNumber}}</td>
+                    <td>{{comp.compPrice}}</td>
+                    <td>{{comp.AddUser}}</td>
+                    <td>{{comp.AddTime}}</td>
+                    <td class="oper">
+                      <span @click="show_dilogc(comp)">修改</span>
+                      <span @click="del_compdata(comp.compId)">删除</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!--当前价格-->
+            <div class="cur_price">
+              <span>
+                当前选项价格:
+                <span class="span_price">{{cur_price}}</span>
+              </span>
+            </div>
+            <!--分页操作-->
+            <div class="page_oper">
+              <PageOper :Page_Msg="Page_Msg" @get_PageData="get_PageData"/>
+            </div>
           </div>
         </div>
       </div>
@@ -89,6 +104,10 @@
           <li class="textli">
             <span>型号名称:</span>
             <el-input class="short_input" v-model="comp_name" :disabled="true" size="small"/>
+          </li>
+          <li class="textli">
+            <span>订货号:</span>
+            <el-input class="short_input" v-model="comp_ordernum" size="small"/>
           </li>
           <li class="textli">
             <span>型号价格:</span>
@@ -108,6 +127,8 @@
     // 1.导入组件
     import SearchFacSer from "../comm/SearchFacSer";
     import dynamicCompspe from "./commComp/dynamicCompspe";
+    import PageOper from "../comm/PageOper";
+
     // 2.导入方法
     import {get_spedata} from "../../network/model/spemanage";        /*获取本体数据*/
     import {get_specompdata} from "../../network/model/spemanage";      /*获取型号数据*/
@@ -119,22 +140,31 @@
         name: "SpePriceManage",
         data(){
           return{
-            // 2.本体数据
+            // 1.本体数据
             spe_data:[],          /*本体规格数据*/
             spe_msgdata:[],       /*本体组件传出的数据*/
             spe_chlist:[],        /*本体选中的数据id*/
 
-            /*型号数据*/
-            compdata:[],         /*型号价格所有数据*/
+            // 2.型号数据
+            comp_data:[],         /*型号价格当前页数据*/
             comp_id:'',          /*型号id*/
             comp_name:'',        /*型号名称*/
             comp_price:'',       /*型号价格*/
-            comp_ordernum:'',     /*订货号*/
+            comp_ordernum:'',    /*订货号*/
             comp_propstr:'',     /*组成型号标题*/
             comp_optstr:'',      /*组成型号选项*/
 
-            /*开关*/
+            // 3.开关
             dilog_update:false,
+
+            // 4.分页数据
+            Page_Msg:{
+              data:[],
+              pagesize:25,
+            },
+
+            /*5.当前选项价格*/
+            cur_price:'',
           }
         },
         computed:{
@@ -176,6 +206,7 @@
           /*监听勾选上的选项*/
           spe_msgdata(newVal){
             this.get_compTit(this.spe_chlist)
+            this.get_curprice(newVal.optStr)
           },
           spe_chlist(newVal){
             this.get_compTit(newVal)
@@ -201,20 +232,19 @@
           /*c.获取型号价格所有数据*/
           get_compdata(seriesid){
             get_specompdata(seriesid).then(res=>{
-              this.compdata=res
+              /*this.comp_data=res*/
+              this.Page_Msg.data=res
             })
           },
 
           /*d.得到本体规格传出的数据*/
           get_SpeMesData(MesData){
             this.spe_msgdata=MesData;
-            /*console.log(Spe_MesData)*/
           },
 
           /*e.获取勾选上的本体*/
           get_SpechList(spe_checked){
             this.spe_chlist=spe_checked;
-            /*console.log(spe_checked)*/
           },
 
           /*f.获取型号信息*/
@@ -249,6 +279,26 @@
             /*console.log(compTit)
             console.log(this.comp_propstr)
             console.log(this.comp_optstr)*/
+          },
+
+          /*i.获取分页后的数据*/
+          get_PageData(data){
+            this.comp_data=data
+          },
+
+          /*j.获取当前价格*/
+          get_curprice(optstr){
+            let cur_price = ''
+            for(let i=0;i<this.Page_Msg.data.length;i++){
+              if(this.Page_Msg.data[i].optStr===optstr){
+                cur_price=this.Page_Msg.data[i].compPrice;
+              }
+            }
+            if(cur_price !== ''){
+              this.cur_price = '￥' + cur_price
+            }else{
+              this.cur_price = '该组合暂未添加价格'
+            }
           },
 
           // 2.添加数据
@@ -300,15 +350,16 @@
           },
 
           /*3.修改数据*/
-          /*显示修改对话框*/
+          /*a.显示修改对话框*/
           show_dilogc(comp){
             this.comp_id=comp.compId;
             this.comp_name=comp.compName;
             this.comp_price=comp.compPrice;
+            this.comp_ordernum=comp.compNumber;
             this.dilog_update=true
           },
 
-          /*修改型号价格数据*/
+          /*b.修改型号价格数据*/
           update_compdata(){
             if (this.comp_price==='' || isNaN(this.comp_price) || parseInt(this.comp_price)<0){
               this.$message({
@@ -320,6 +371,8 @@
             }
             let compdata={
               compId:this.comp_id,
+              compName:this.comp_name,
+              compNumber:this.comp_ordernum,
               compPrice:this.comp_price,
               AddTime:this.sys_date,
               AddUser:this.user
@@ -375,11 +428,11 @@
               });
             })
           },
-
         },
         components:{
           SearchFacSer,
-          dynamicCompspe
+          dynamicCompspe,
+          PageOper
         },
     }
 </script>

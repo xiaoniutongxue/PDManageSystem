@@ -1,4 +1,3 @@
-<!--公共组件，用于本体规格和附件选择详情框-->
 <template>
     <!--组件总框-->
     <div class="dy-all">
@@ -14,17 +13,18 @@
                      />
                 <span>
                     {{tititem.propName}}
+                    {{tititem.propId}}
                     <!--{{tititem.compChar}}-->
                 </span>
             </div>
             <div class="dy-option">
                 <ul>
-                    <div @click="get_ClickOptlist(i)" class="optitem">
+                    <div @click="get_ClickOptlist()" class="optitem">
                         <li :class="is_changeClass(i,optitem.optId)" :id="optitem.optId" :name="dynamicdata"
                             v-if="is_ShowOpt(optitem.optId)" v-for="(optitem,j) in tititem.child"
                             @click="is_changeColor(i,optitem.optId)">
                             {{optitem.optName}}
-                            <!--{{optitem.optId}}-->
+                            {{optitem.optId}}
                         </li>
                     </div>
                     <div style="clear: both"></div>
@@ -46,7 +46,8 @@
                 /*默认*/
                 dy_originalTitleIdList:[],     /*原始默认的标题id组成的数组*/
                 dy_originalTitleIdStr:"",      /*原始默认的标题id组成的字符串*/
-                dy_originalTitleCodelist:[],   /*原始默认的标题连接符组成的字符串*/
+                dy_originalTitleCodelist:[],   /*原始默认的标题连接符组成的数组*/
+                dy_originalTitleTypelist:[],   /*原始默认的标题连接符组成的数组*/
                 dy_originalOptionIdList:[],    /*原始默认的标题id组成的数组*/
                 dy_originalOptionIdStr:"",     /*原始默认的选项id组成的字符串*/
 
@@ -112,10 +113,12 @@
                 let titletpropIDs="";
                 this.dy_originalTitleIdList=[];
                 this.dy_originalTitleCodelist=[];
+                this.dy_originalTitleTypelist=[]
                 for(let i=0;i<list.length;i++){
                     titletpropIDs=titletpropIDs+"-"+list[i].propId;
                     this.dy_originalTitleIdList.push(list[i].propId);
                     this.dy_originalTitleCodelist.push(list[i].propCode)
+                    this.dy_originalTitleTypelist.push(list[i].use_type)
                 }
                 this.dy_originalTitleIdStr=titletpropIDs.substring(1,titletpropIDs.length);
 
@@ -146,6 +149,7 @@
                   this.dyRel_AllRellist=res;
                 })
               }
+              /*console.log(this.dyRel_AllRellist)*/
             },
 
             /*c.获取需要显示的选项*/
@@ -205,12 +209,20 @@
             /*e.得到本体规格已经选中的选项id和选项值*/
             get_SpeOptandOptvalue(){
                 /*1.得到选中的选项id字符串*/
-                let SelectedOpt="",SelecteOptVlue="";            /*定义已经选中的选项id和选项值*/
+                let SelectedOpt="",SelecteOptVlue="";               /*定义已经选中的选项id和选项值*/
+                let SelectedProp="",SelectedPropList=[]             /*定义标题为B的字符串和数组*/
                 let SelectedOptlist=[],SelectedValuelist=[];       /*定义已经选中的选项id数组和选项值数组*/
-                for(let i=0;i<this.dy_DefSelectedOptList.length;i++){
+                for(let i=0;i<this.dy_originalTitleTypelist.length;i++){
+                  if(this.dy_originalTitleTypelist[i]==='B'){
+                    /*标题*/
+                    SelectedProp=SelectedProp+'-'+this.dy_originalTitleIdList[i];
+                    SelectedPropList.push(this.dy_originalTitleIdList[i]);
+                    /*选项*/
                     SelectedOpt=SelectedOpt+'-'+this.dy_DefSelectedOptList[i];
-                    SelectedOptlist.push(this.dy_DefSelectedOptList[i]);       /*得到已经选中的选项id数组*/
+                    SelectedOptlist.push(this.dy_DefSelectedOptList[i]);
+                  }
                 }
+                let DefSelectedPropStr=SelectedProp.substring(1,SelectedProp.length);
                 let DefSelectedOptStr=SelectedOpt.substring(1,SelectedOpt.length);
                 /*2.得到选中选项的value值*/
                 for(let i=0;i<this.dy_DefSelectedOptList.length;i++){
@@ -223,19 +235,19 @@
                 }
                 /*3.得到连接符*/
                 let MesData={
-                  propStr:this.dy_originalTitleIdStr,
-                  propList:this.dy_originalTitleIdList,
+                  propStr:DefSelectedPropStr,
+                  propList:SelectedPropList,
                   propCodeList:this.dy_originalTitleCodelist,
                   optStr:DefSelectedOptStr,
                   optList:SelectedOptlist,
                   optValList:SelectedValuelist
                 }
                 this.$emit('get_MesData',MesData)
-                /*console.log(Spe_MesData)*/
+                /*console.log(MesData)*/
             },
 
             /*f.得到点击时选项id组成的数组*/
-            get_ClickOptlist(i){
+            get_ClickOptlist(){
                 let optionId=document.getElementsByClassName('changeColor');
                 /*1.获取本体规格所有选项的id组成的数组及字符串*/
                 let OptionIds="";
@@ -254,7 +266,6 @@
               let checked=[]
               for(let i=0;i<checkbox.length;i++){
                 if(checkbox[i].checked==true){
-                  /*spe_checked.push(parseInt(checkbox[i].id))*/
                   checked.push(i)
                 }
               }

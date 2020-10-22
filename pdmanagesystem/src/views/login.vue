@@ -56,7 +56,11 @@
               cookie.setCookie(udata,2)
               this.$router.push({'path':'index'})
             }else{
-              console.log('登陆失败!')
+              this.$message({
+                type:'error',
+                message:'用户名或密码错误!',
+                duration:3000
+              })
             }
           })
         }

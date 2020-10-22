@@ -30,6 +30,17 @@ export function user_update(userdata) {
   })
 }
 
+/*修改用户密码*/
+export function user_updatepwd(pwddata) {
+  return request({
+    method:'POST',
+    url:'/user_updatepwd',
+    params:{
+      pwddata
+    }
+  })
+}
+
 /*删除用户信息*/
 export function user_del(uid) {
   return request({

@@ -7,7 +7,8 @@ import index from '../views/index'    /*首页组件*/
 
 // 2.系统信息管理组件
 import SysUserManage from "../components/system/SysUserManage";             /*系统管理员信息*/
-import UserErr from "../components/comm/UserErr";
+import SysUserPwd from "../components/system/SysUserPwd";                   /*用户密码修改*/
+import UserErr from "../components/comm/UserErr";                           /*用户权限错误*/
 
 // 3.选型管理组件
 import FacManage from "../components/model/FacManage";                      /*品牌管理*/
@@ -19,8 +20,7 @@ import AccDataManage from "../components/model/AccDataManage";              /*�
 import AccRelManage from "../components/model/AccRelManage";                /*附件关系*/
 import AccPriceManage from "../components/model/AccPriceManage";            /*附件价格*/
 import ParamDataManage from "../components/model/ParamDataManage";          /*特性参数*/
-import SpeRelManagenew from "../components/model/SpeRelManagenew";
-import test from "../components/model/test";
+
 
 
 Vue.use(VueRouter)
@@ -46,69 +46,68 @@ const routes=[
     redirect:'/index/facmanage',
     children:[
       // 1.选项管理
-      /*品牌管理*/
+      /*a.品牌管理*/
       {
         path:'/index/facmanage',
         component:FacManage
       },
-      /*系列管理*/
+      /*b.系列管理*/
       {
         path: '/index/sermanage',
         component: SerManage
       },
-      /*本体数据管理*/
+      /*c.本体数据管理*/
       {
         path: '/index/spedatamanage',
         component: SpeDataManage
       },
-      /*本体关系管理*/
+      /*d.本体关系管理*/
       {
         path: '/index/sperelmanage',
         component: SpeRelManage
       },
-      /*本体价格管理*/
+      /*e.本体价格管理*/
       {
         path: '/index/spepricemanage',
         component: SpePriceManage
       },
-      /*附件选择数据管理*/
+      /*f.附件选择数据管理*/
       {
         path: '/index/accdatamanage',
         component: AccDataManage
       },
-      /*附件选择关系管理*/
+      /*g.附件选择关系管理*/
       {
         path: '/index/accrelmanage',
         component: AccRelManage
       },
-      /*附件选择价格管理*/
+      /*h.附件选择价格管理*/
       {
         path: '/index/accpricemanage',
         component: AccPriceManage
       },
-      /*特性参数数据管理*/
+      /*i.特性参数数据管理*/
       {
         path: '/index/parammanage',
         component: ParamDataManage
       },
       // 3.系统管理
+      /*a.用户信息*/
       {
         path: '/index/sysusermanage',
         component: SysUserManage
       },
+      /*b.用户错误*/
       {
         path: '/index/sysusererr',
         component: UserErr
       },
+      /*c.用户密码修改*/
       {
         path: '/index/sysuserpwd',
-        component: SpeRelManagenew
+        component: SysUserPwd
       },
-      /*测试*/
-      {
-        path: '/index/test',
-        component: test
-      },
+
     ]
   }
 ]

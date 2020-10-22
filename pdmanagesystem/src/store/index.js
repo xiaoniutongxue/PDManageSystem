@@ -6,10 +6,18 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    /*1.页面加载创建时加载数据*/
+    // 1.页面加载创建时加载数据
     AllareaData:[],              /*全国地区数据*/
 
-    // 2.公共数据
+    //2.系列管理数据
+    Ser_data:{
+      fac_id:'',
+      fac_name:'',
+      selectedid:''
+    },
+
+    // 3.公共数据
+    /*厂商系列搜索框数据*/
     facserdata:{
       fac_id:'',
       fac_name:'',
@@ -17,7 +25,7 @@ export default new Vuex.Store({
       ser_name:''
     },                        /*品牌系列选中数据*/
     sys_date:new Date(),      /*当前系统时间*/
-    user:'',                /*登录用户*/
+    user:'',                  /*登录用户*/
 
     arr:'',
   },
@@ -27,7 +35,12 @@ export default new Vuex.Store({
       state.AllareaData=list
     },
 
-    //2.获取动态公共数据
+    // 2.获取系列管理数据
+    get_SerData(state,serdata){
+      state.Ser_data=serdata;
+    },
+
+    //3.获取动态公共数据
     /*a.品牌id,系列id*/
     get_FacSerData(state,facserdata){
       state.facserdata.fac_id=facserdata.fac_id;

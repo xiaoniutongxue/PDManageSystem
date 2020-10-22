@@ -17,8 +17,10 @@
 
     <!--品牌内容-->
     <div class="fac_cont">
-      <table>
-        <thead>
+      <!--数据表格-->
+      <div class="page_table">
+        <table>
+          <thead>
           <tr>
             <td>全选</td>
             <td>id</td>
@@ -34,9 +36,9 @@
             <td>详细地址</td>
             <td>操作</td>
           </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(fac,i) in fac_data">
+          </thead>
+          <tbody>
+          <tr v-for="(fac,i) in fac_PageData">
             <td>全选</td>
             <td>{{fac.factID}}</td>
             <td>{{fac.factName}}</td>
@@ -55,21 +57,13 @@
               <span @click="del_facdata(i)">删除</span>
             </td>
           </tr>
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
 
       <!--分页操作-->
       <div class="page_oper">
-        <ul>
-          <li>首页</li>
-          <li>上一页</li>
-          <li>下一页</li>
-          <li>尾页</li>
-          <li class="page_num">
-            <input type="text"></input>
-          </li>
-          <li>GO</li>
-        </ul>
+        <PageOper :Page_Msg="Page_Msg" @get_PageData="get_PageData"/>
       </div>
     </div>
 
@@ -390,7 +384,8 @@
     import pinyin from "../../assets/js/comm/pinyin";
 
     /*导入组件*/
-    import Area from "../comm/Area";
+    import Area from "../comm/Area";                          /*地区组件*/
+    import PageOper from "../comm/PageOper";                  /*分页组件*/
 
     export default {
         name: "FacManage",
@@ -403,6 +398,7 @@
 
             /*2.厂商所有数据*/
             fac_data:[],                    /*所有厂商数据*/
+            fac_PageData:[],                /*厂商分页分页数据*/
             fac_itemdata:[],                /*厂商单个数据*/
             fac_val:'',                     /*厂商查询输入值*/
 
@@ -433,6 +429,12 @@
 
             /*4.地区数据*/
             AreaDefault:[],                 /*地区默认值*/
+
+            /*5.分页数据*/
+            Page_Msg:{
+              data:[],
+              pagesize:20,
+            }
         }
         },
         created() {
@@ -449,6 +451,7 @@
             }
         },
         components:{
+          PageOper,
           Area
         },
         methods:{
@@ -457,12 +460,18 @@
           get_FacData(){
             get_factorydata().then(res=>{
               this.fac_data=res;
+              this.Page_Msg.data=res;
             })
           },
 
           /*b.获取地区信息*/
           get_area(area){
             this.Area=area
+          },
+
+          /*c.获取分页数据*/
+          get_PageData(data){
+            this.fac_PageData=data
           },
 
           // 2.添加数据
@@ -880,7 +889,7 @@
             }
           },
 
-          /*清空搜索框*/
+          /*7.清空搜索框*/
           clear_facval(){
             this.fac_val="";
             this.search_fac();
